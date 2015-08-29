@@ -6,7 +6,7 @@ import "net"
 
 func newUnixListener(
 	volumeDriverName string,
-	address string,
+	group string,
 	start <-chan struct{},
 ) (net.Listener, error) {
 	return nil, nil

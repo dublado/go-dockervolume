@@ -44,12 +44,12 @@ func NewTCPListener(
 // NewUnixListener returns a new net.Listener for Unix.
 func NewUnixListener(
 	volumeDriverName string,
-	address string,
+	group string,
 	start <-chan struct{},
 ) (net.Listener, error) {
 	return newUnixListener(
 		volumeDriverName,
-		address,
+		group,
 		start,
 	)
 }

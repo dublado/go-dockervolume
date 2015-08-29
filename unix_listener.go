@@ -16,14 +16,14 @@ const (
 
 func newUnixListener(
 	volumeDriverName string,
-	address string,
+	group string,
 	start <-chan struct{},
 ) (net.Listener, error) {
-	path, err := fullSocketAddress(address)
+	path, err := fullSocketAddress(volumeDriverName)
 	if err != nil {
 		return nil, err
 	}
-	return sockets.NewUnixSocket(path, volumeDriverName, start)
+	return sockets.NewUnixSocket(path, group, start)
 }
 
 func fullSocketAddress(address string) (string, error) {
