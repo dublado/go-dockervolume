@@ -90,7 +90,10 @@ func volumeDriverCreate(volumeDriver VolumeDriver, request map[string]interface{
 	name := request["Name"].(string)
 	var opts map[string]string
 	if _, ok := request["Opts"]; ok {
-		opts = request["Opts"].(map[string]string)
+		opts = make(map[string]string)
+		for key, value := range request["Opts"].(map[string]interface{}) {
+			opts[key] = fmt.Sprintf("%v", value)
+		}
 	}
 	return nil, volumeDriver.Create(name, opts)
 }
