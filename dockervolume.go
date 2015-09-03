@@ -90,7 +90,7 @@ func Serve(
 	protocol Protocol,
 	volumeDriverName string,
 	groupOrAddress string,
-) error {
+) (retErr error) {
 	server := &http.Server{
 		Handler: volumeDriverHandler,
 	}
@@ -109,7 +109,11 @@ func Serve(
 		return fmt.Errorf("unknown protocol: %v", protocol)
 	}
 	if spec != "" {
-		defer os.Remove(spec)
+		defer func() {
+			if err := os.Remove(spec); err != nil && retErr == nil {
+				retErr = err
+			}
+		}()
 	}
 	if err != nil {
 		return err
