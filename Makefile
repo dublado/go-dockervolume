@@ -60,6 +60,6 @@ proto:
 	go get -v github.com/peter-edge/go-tools/docker-protoc-all
 	docker pull pedge/protolog
 	docker-protoc-all go.pedge.io/dockervolume
-	rm /tmp/protolog.pb.go
+	rm -f /tmp/protolog.pb.go
 	tail -n +$$(grep -n 'package dockervolume' protolog.pb.go | cut -f 1 -d :) protolog.pb.go > /tmp/protolog.pb.go
 	/tmp/protolog.pb.go protolog.pb.go
