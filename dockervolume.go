@@ -29,11 +29,13 @@ func NewVolumeDriverHandler(volumeDriver VolumeDriver) http.Handler {
 }
 
 // NewTCPListener returns a new net.Listener for TCP.
+//
+// The string returned is a file that should be removed when finished with the listener.
 func NewTCPListener(
 	volumeDriverName string,
 	address string,
 	start <-chan struct{},
-) (net.Listener, error) {
+) (net.Listener, string, error) {
 	return newTCPListener(
 		volumeDriverName,
 		address,
@@ -42,11 +44,13 @@ func NewTCPListener(
 }
 
 // NewUnixListener returns a new net.Listener for Unix.
+//
+// The string returned is a file that should be removed when finished with the listener.
 func NewUnixListener(
 	volumeDriverName string,
 	group string,
 	start <-chan struct{},
-) (net.Listener, error) {
+) (net.Listener, string, error) {
 	return newUnixListener(
 		volumeDriverName,
 		group,
