@@ -62,4 +62,4 @@ proto:
 	docker-protoc-all go.pedge.io/dockervolume
 	rm -f /tmp/protolog.pb.go
 	tail -n +$$(grep -n 'package dockervolume' protolog.pb.go | cut -f 1 -d :) protolog.pb.go > /tmp/protolog.pb.go
-	/tmp/protolog.pb.go protolog.pb.go
+	mv /tmp/protolog.pb.go protolog.pb.go
