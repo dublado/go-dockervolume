@@ -35,9 +35,23 @@ type VolumeDriver interface {
 	Unmount(name string) (err error)
 }
 
+// Logger is a generic interface for logging requests to a VolumeDriver.
+type Logger interface {
+	LogRequest(id string, method string, parameters ...interface{})
+	LogResponse(id string, method string, response interface{}, err error)
+}
+
+// VolumeDriverHandlerOptions are options for a new volume driver handler.
+type VolumeDriverHandlerOptions struct {
+	// Logger specifies a customer logger.
+	//
+	// If not specified, the default Logger will be used.
+	Logger Logger
+}
+
 // NewVolumeDriverHandler returns a new http.Handler.
-func NewVolumeDriverHandler(volumeDriver VolumeDriver) http.Handler {
-	return newVolumeDriverHandler(volumeDriver)
+func NewVolumeDriverHandler(volumeDriver VolumeDriver, opts VolumeDriverHandlerOptions) http.Handler {
+	return newVolumeDriverHandler(volumeDriver, opts)
 }
 
 // NewTCPListener returns a new net.Listener for TCP.

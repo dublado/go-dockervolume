@@ -14,7 +14,7 @@ var (
 	activateResponse = []byte("{\"Implements\": [\"VolumeDriver\"]}\n")
 )
 
-func newVolumeDriverHandler(volumeDriver VolumeDriver) *http.ServeMux {
+func newVolumeDriverHandler(volumeDriver VolumeDriver, opts VolumeDriverHandlerOptions) *http.ServeMux {
 	serveMux := http.NewServeMux()
 	serveMux.HandleFunc(
 		"/Plugin.Activate",
