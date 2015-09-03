@@ -32,7 +32,7 @@ build: deps
 
 lint: testdeps
 	go get -v github.com/golang/lint/golint
-	for file in $$(find . -name '*.go'); do \
+	for file in $$(find . -name '*.go' | grep -v '\.pb\.go' | grep -v '\.pb\.log\.go'); do \
 		golint $$file; \
 		if [ -n "$$(golint $$file)" ]; then \
 			exit 1; \

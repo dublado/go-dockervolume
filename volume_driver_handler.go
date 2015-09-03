@@ -88,44 +88,51 @@ func newGenericHandlerFunc(
 			return
 		}
 		responseWriter.Header().Set("Content-Type", contentType)
-		_ = json.NewEncoder(responseWriter).Encode(wrap(method, f, m, getLogger(opts)))
+		_ = json.NewEncoder(responseWriter).Encode(wrap(getLogger(opts), method, f, m))
 	}
 }
 
 func wrap(
+	logger Logger,
 	method Method,
 	f func(string, map[string]string) (string, error),
 	request map[string]interface{},
-	logger Logger,
 ) map[string]interface{} {
+	name, opts, err := extractParameters(request)
 	methodInvocation := &MethodInvocation{
 		Method: method,
+		Name:   name,
+		Opts:   opts,
 	}
-	response := make(map[string]interface{})
+	if err != nil {
+		return handleResponse(logger, methodInvocation, "", err)
+	}
+	mountpoint, err := f(name, opts)
+	return handleResponse(logger, methodInvocation, mountpoint, err)
+}
+
+func extractParameters(request map[string]interface{}) (string, map[string]string, error) {
 	if err := checkRequiredParameters(request, "Name"); err != nil {
-		response["Err"] = err.Error()
-		methodInvocation.Error = err.Error()
-		logger.LogMethodInvocation(methodInvocation)
-		return response
+		return "", nil, err
 	}
 	name := request["Name"].(string)
 	var opts map[string]string
 	if _, ok := request["Opts"]; ok {
-		opts = make(map[string]string)
-		for key, value := range request["Opts"].(map[string]interface{}) {
-			opts[key] = fmt.Sprintf("%v", value)
-		}
+		opts = mapStringInterfaceToMapStringString(request["Opts"].(map[string]interface{}))
 	}
-	methodInvocation.Name = name
-	methodInvocation.Opts = opts
-	mountpoint, err := f(name, opts)
+	return name, opts, nil
+}
+
+func handleResponse(logger Logger, methodInvocation *MethodInvocation, mountpoint string, err error) map[string]interface{} {
+	response := make(map[string]interface{})
 	if mountpoint != "" {
 		response["Mountpoint"] = mountpoint
 		methodInvocation.Mountpoint = mountpoint
 	}
 	if err != nil {
-		response["Err"] = err.Error()
-		methodInvocation.Error = err.Error()
+		errString := err.Error()
+		response["Err"] = errString
+		methodInvocation.Error = errString
 	}
 	logger.LogMethodInvocation(methodInvocation)
 	return response
@@ -145,4 +152,12 @@ func getLogger(opts VolumeDriverHandlerOptions) Logger {
 		return opts.Logger
 	}
 	return loggerInstance
+}
+
+func mapStringInterfaceToMapStringString(m map[string]interface{}) map[string]string {
+	n := make(map[string]string)
+	for key, value := range m {
+		n[key] = fmt.Sprintf("%v", value)
+	}
+	return n
 }
