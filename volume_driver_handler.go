@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	contentType = "application/vnd.docker.plugins.v1+json"
+	contentType = "application/vnd.docker.plugins.v1.1+json"
 )
 
 var (
