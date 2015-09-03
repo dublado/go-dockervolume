@@ -10,7 +10,8 @@
 	errcheck \
 	pretest \
 	test \
-	clean
+	clean \
+	proto
 
 all: test
 
@@ -54,3 +55,8 @@ test: testdeps pretest
 clean:
 	go clean ./...
 	GOOS=linux go clean ./...
+
+proto:
+	go get -v github.com/peter-edge/go-tools/docker-protoc-all
+	docker pull pedge/protolog
+	docker-protoc-all go.pedge.io/dockervolume
