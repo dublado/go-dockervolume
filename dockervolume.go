@@ -1,9 +1,21 @@
 package dockervolume // import "go.pedge.io/dockervolume"
 
 import (
+	"fmt"
 	"net"
 	"net/http"
+	"os"
 )
+
+const (
+	// ProtocolTCP denotes using TCP.
+	ProtocolTCP Protocol = iota
+	// ProtocolUnix denotex using Unix sockets.
+	ProtocolUnix
+)
+
+// Protocol represents TCP or Unix.
+type Protocol int
 
 // VolumeDriver mimics docker's volumedrivers.VolumeDriver, except
 // does not use the volumedrivers.opts type. This allows this interface
@@ -56,4 +68,38 @@ func NewUnixListener(
 		group,
 		start,
 	)
+}
+
+// Serve serves the vomue driver handler.
+func Serve(
+	volumeDriverHandler http.Handler,
+	protocol Protocol,
+	volumeDriverName string,
+	groupOrAddress string,
+) error {
+	server := &http.Server{
+		Handler: volumeDriverHandler,
+	}
+	start := make(chan struct{})
+	var listener net.Listener
+	var spec string
+	var err error
+	switch protocol {
+	case ProtocolTCP:
+		listener, spec, err = NewTCPListener(volumeDriverName, groupOrAddress, start)
+		server.Addr = groupOrAddress
+	case ProtocolUnix:
+		listener, spec, err = NewUnixListener(volumeDriverName, groupOrAddress, start)
+		server.Addr = volumeDriverName
+	default:
+		return fmt.Errorf("unknown protocol: %v", protocol)
+	}
+	if spec != "" {
+		defer os.Remove(spec)
+	}
+	if err != nil {
+		return err
+	}
+	close(start)
+	return server.Serve(listener)
 }
