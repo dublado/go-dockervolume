@@ -17,11 +17,7 @@ const (
 // Protocol represents TCP or Unix.
 type Protocol int
 
-// VolumeDriver mimics docker's volumedrivers.VolumeDriver, except
-// does not use the volumedrivers.opts type. This allows this interface
-// to be implemented in other packages.
-//
-// TODO(pedge): replace this if volumedrivers.VolumeDriver stops doing this.
+// VolumeDriver is the interface that should be implemented for custom volume drivers.
 type VolumeDriver interface {
 	// Create a volume with the given name
 	Create(name string, opts map[string]string) (err error)
