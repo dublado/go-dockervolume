@@ -37,5 +37,9 @@ func fullSocketAddress(address string) (string, error) {
 	if filepath.IsAbs(address) {
 		return address, nil
 	}
-	return filepath.Join(pluginSockDir, address+".sock"), nil
+	dir := filepath.Join(pluginSockDir, address)
+	if err := os.MkdirAll(dir, 0755); err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, address+".sock"), nil
 }
