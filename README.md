@@ -27,9 +27,7 @@ import (
 )
 ```
 
-Your volume plugin must implement the `VolumeDriver` interface. This interface is meant
-to match docker's `volumedrivers.VolumeDriver` [interface](https://github.com/docker/docker/blob/master/volume/drivers/extpoint.go),
-but handles a small issue with that interface's usage of a private type.
+Your volume plugin must implement the `VolumeDriver` interface.
 
 To launch your plugin using Unix sockets, do:
 
