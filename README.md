@@ -34,9 +34,9 @@ To launch your plugin using Unix sockets, do:
 ```
 func launch(volumeDriver dockervolume.VolumeDriver) error {
   return dockervolume.Serve(
-    dockervolume.NewVolumeDriverHandler(
+    dockervolume.NewHandler(
       volumeDriver,
-      dockervolume.VolumeDriverHandlerOptions{},
+      dockervolume.HandlerOptions{},
     ),
     dockervolume.ProtocolUnix,
     "volume_driver_name",
@@ -50,9 +50,9 @@ To launch your plugin using TCP, do:
 ```
 func launch(volumeDriver dockervolume.VolumeDriver) error {
   return dockervolume.Serve(
-    dockervolume.NewVolumeDriverHandler(
+    dockervolume.NewHandler(
       volumeDriver,
-      dockervolume.VolumeDriverHandlerOptions{},
+      dockervolume.HandlerOptions{},
     ),
     dockervolume.ProtocolTCP,
     "volume_driver_name",

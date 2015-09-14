@@ -14,7 +14,11 @@ var (
 	activateResponse = []byte("{\"Implements\": [\"VolumeDriver\"]}\n")
 )
 
-func newVolumeDriverHandler(volumeDriver VolumeDriver, opts VolumeDriverHandlerOptions) *http.ServeMux {
+type handler struct {
+	*http.ServeMux
+}
+
+func newHandler(volumeDriver VolumeDriver, opts HandlerOptions) *handler {
 	serveMux := http.NewServeMux()
 	serveMux.HandleFunc(
 		"/Plugin.Activate",
@@ -73,13 +77,15 @@ func newVolumeDriverHandler(volumeDriver VolumeDriver, opts VolumeDriverHandlerO
 			opts,
 		),
 	)
-	return serveMux
+	return &handler{
+		serveMux,
+	}
 }
 
 func newGenericHandlerFunc(
 	method Method,
 	f func(string, map[string]string) (string, error),
-	opts VolumeDriverHandlerOptions,
+	opts HandlerOptions,
 ) func(http.ResponseWriter, *http.Request) {
 	return func(responseWriter http.ResponseWriter, request *http.Request) {
 		m := make(map[string]interface{})
@@ -147,7 +153,7 @@ func checkRequiredParameters(request map[string]interface{}, parameters ...strin
 	return nil
 }
 
-func getLogger(opts VolumeDriverHandlerOptions) Logger {
+func getLogger(opts HandlerOptions) Logger {
 	if opts.Logger != nil {
 		return opts.Logger
 	}
