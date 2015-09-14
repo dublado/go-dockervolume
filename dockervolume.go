@@ -33,7 +33,7 @@ type VolumeDriver interface {
 
 // Logger is a generic interface for logging requests to a VolumeDriver.
 type Logger interface {
-	LogMethodInvocation(methodInvocation *MethodInvocation)
+	LogCall(call *Call)
 }
 
 // VolumeDriverHandlerOptions are options for a new volume driver handler.

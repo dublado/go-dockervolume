@@ -45,7 +45,7 @@ func (x Method) String() string {
 	return proto.EnumName(Method_name, int32(x))
 }
 
-type MethodInvocation struct {
+type Call struct {
 	Method     Method            `protobuf:"varint,1,opt,name=method,enum=dockervolume.Method" json:"method,omitempty"`
 	Name       string            `protobuf:"bytes,2,opt,name=name" json:"name,omitempty"`
 	Opts       map[string]string `protobuf:"bytes,3,rep,name=opts" json:"opts,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
@@ -53,11 +53,11 @@ type MethodInvocation struct {
 	Error      string            `protobuf:"bytes,5,opt,name=error" json:"error,omitempty"`
 }
 
-func (m *MethodInvocation) Reset()         { *m = MethodInvocation{} }
-func (m *MethodInvocation) String() string { return proto.CompactTextString(m) }
-func (*MethodInvocation) ProtoMessage()    {}
+func (m *Call) Reset()         { *m = Call{} }
+func (m *Call) String() string { return proto.CompactTextString(m) }
+func (*Call) ProtoMessage()    {}
 
-func (m *MethodInvocation) GetOpts() map[string]string {
+func (m *Call) GetOpts() map[string]string {
 	if m != nil {
 		return m.Opts
 	}
