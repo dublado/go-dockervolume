@@ -1,11 +1,6 @@
 package dockervolume // import "go.pedge.io/dockervolume"
 
-import (
-	"fmt"
-	"net"
-	"net/http"
-	"os"
-)
+import "google.golang.org/grpc"
 
 const (
 	// ProtocolTCP denotes using TCP.
@@ -31,78 +26,33 @@ type VolumeDriver interface {
 	Unmount(name string) (err error)
 }
 
-func NewVolumeDriver(volumeDriverClient VolumeDriverClient) VolumeDriver {
-	return nil
+// VolumeDriverClient can call VolumeDrivers, along with additional functionality.
+type VolumeDriverClient interface {
+	VolumeDriver
 }
 
-func NewVolumeDriverServer(volumeDriver VolumeDriver) VolumeDriverServer {
-	return nil
+// NewVolumeDriverClient creates a new VolumeDriverClient for the given *grpc.ClientConn.
+func NewVolumeDriverClient(clientConn *grpc.ClientConn) VolumeDriverClient {
+	return newVolumeDriverClient(clientConn)
 }
 
-// NewTCPListener returns a new net.Listener for TCP.
+// Serve serves the VolumeDriver.
 //
-// The string returned is a file that should be removed when finished with the listener.
-func NewTCPListener(
-	volumeDriverName string,
-	address string,
-	start <-chan struct{},
-) (net.Listener, string, error) {
-	return newTCPListener(
-		volumeDriverName,
-		address,
-		start,
-	)
-}
-
-// NewUnixListener returns a new net.Listener for Unix.
-//
-// The string returned is a file that should be removed when finished with the listener.
-func NewUnixListener(
-	volumeDriverName string,
-	group string,
-	start <-chan struct{},
-) (net.Listener, string, error) {
-	return newUnixListener(
-		volumeDriverName,
-		group,
-		start,
-	)
-}
-
-// Serve serves the volume driver handler.
+// grpcDebugPort can be 0.
 func Serve(
-	volumeDriver volumeDriver,
+	volumeDriver VolumeDriver,
 	protocol Protocol,
 	volumeDriverName string,
 	groupOrAddress string,
-) (retErr error) {
-	server := &http.Server{
-		Handler: handler,
-	}
-	start := make(chan struct{})
-	var listener net.Listener
-	var spec string
-	var err error
-	switch protocol {
-	case ProtocolTCP:
-		listener, spec, err = NewTCPListener(volumeDriverName, groupOrAddress, start)
-		server.Addr = groupOrAddress
-	case ProtocolUnix:
-		listener, spec, err = NewUnixListener(volumeDriverName, groupOrAddress, start)
-		server.Addr = volumeDriverName
-	default:
-		return fmt.Errorf("unknown protocol: %v", protocol)
-	}
-	if spec != "" {
-		defer func() {
-			if err := os.Remove(spec); err != nil && retErr == nil {
-				retErr = err
-			}
-		}()
-	}
-	if err != nil {
-		return err
-	}
-	close(start)
-	return server.Serve(listener)
+	grpcPort uint16,
+	grpcDebugPort uint16,
+) error {
+	return serve(
+		volumeDriver,
+		protocol,
+		volumeDriverName,
+		groupOrAddress,
+		grpcPort,
+		grpcDebugPort,
+	)
 }

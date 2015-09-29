@@ -123,9 +123,9 @@ func (*UnmountResponse) ProtoMessage()    {}
 var _ context.Context
 var _ grpc.ClientConn
 
-// Client API for VolumeDriver service
+// Client API for API service
 
-type VolumeDriverClient interface {
+type APIClient interface {
 	Activate(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*ActivateResponse, error)
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Remove(ctx context.Context, in *RemoveRequest, opts ...grpc.CallOption) (*RemoveResponse, error)
@@ -134,71 +134,71 @@ type VolumeDriverClient interface {
 	Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error)
 }
 
-type volumeDriverClient struct {
+type aPIClient struct {
 	cc *grpc.ClientConn
 }
 
-func NewVolumeDriverClient(cc *grpc.ClientConn) VolumeDriverClient {
-	return &volumeDriverClient{cc}
+func NewAPIClient(cc *grpc.ClientConn) APIClient {
+	return &aPIClient{cc}
 }
 
-func (c *volumeDriverClient) Activate(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*ActivateResponse, error) {
+func (c *aPIClient) Activate(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*ActivateResponse, error) {
 	out := new(ActivateResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.VolumeDriver/Activate", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/dockervolume.API/Activate", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *volumeDriverClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
+func (c *aPIClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
 	out := new(CreateResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.VolumeDriver/Create", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/dockervolume.API/Create", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *volumeDriverClient) Remove(ctx context.Context, in *RemoveRequest, opts ...grpc.CallOption) (*RemoveResponse, error) {
+func (c *aPIClient) Remove(ctx context.Context, in *RemoveRequest, opts ...grpc.CallOption) (*RemoveResponse, error) {
 	out := new(RemoveResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.VolumeDriver/Remove", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/dockervolume.API/Remove", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *volumeDriverClient) Path(ctx context.Context, in *PathRequest, opts ...grpc.CallOption) (*PathResponse, error) {
+func (c *aPIClient) Path(ctx context.Context, in *PathRequest, opts ...grpc.CallOption) (*PathResponse, error) {
 	out := new(PathResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.VolumeDriver/Path", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/dockervolume.API/Path", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *volumeDriverClient) Mount(ctx context.Context, in *MountRequest, opts ...grpc.CallOption) (*MountResponse, error) {
+func (c *aPIClient) Mount(ctx context.Context, in *MountRequest, opts ...grpc.CallOption) (*MountResponse, error) {
 	out := new(MountResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.VolumeDriver/Mount", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/dockervolume.API/Mount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *volumeDriverClient) Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error) {
+func (c *aPIClient) Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error) {
 	out := new(UnmountResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.VolumeDriver/Unmount", in, out, c.cc, opts...)
+	err := grpc.Invoke(ctx, "/dockervolume.API/Unmount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for VolumeDriver service
+// Server API for API service
 
-type VolumeDriverServer interface {
+type APIServer interface {
 	Activate(context.Context, *google_protobuf1.Empty) (*ActivateResponse, error)
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Remove(context.Context, *RemoveRequest) (*RemoveResponse, error)
@@ -207,109 +207,109 @@ type VolumeDriverServer interface {
 	Unmount(context.Context, *UnmountRequest) (*UnmountResponse, error)
 }
 
-func RegisterVolumeDriverServer(s *grpc.Server, srv VolumeDriverServer) {
-	s.RegisterService(&_VolumeDriver_serviceDesc, srv)
+func RegisterAPIServer(s *grpc.Server, srv APIServer) {
+	s.RegisterService(&_API_serviceDesc, srv)
 }
 
-func _VolumeDriver_Activate_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
+func _API_Activate_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
 	in := new(google_protobuf1.Empty)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(VolumeDriverServer).Activate(ctx, in)
+	out, err := srv.(APIServer).Activate(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func _VolumeDriver_Create_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
+func _API_Create_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
 	in := new(CreateRequest)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(VolumeDriverServer).Create(ctx, in)
+	out, err := srv.(APIServer).Create(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func _VolumeDriver_Remove_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
+func _API_Remove_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
 	in := new(RemoveRequest)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(VolumeDriverServer).Remove(ctx, in)
+	out, err := srv.(APIServer).Remove(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func _VolumeDriver_Path_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
+func _API_Path_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
 	in := new(PathRequest)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(VolumeDriverServer).Path(ctx, in)
+	out, err := srv.(APIServer).Path(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func _VolumeDriver_Mount_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
+func _API_Mount_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
 	in := new(MountRequest)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(VolumeDriverServer).Mount(ctx, in)
+	out, err := srv.(APIServer).Mount(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func _VolumeDriver_Unmount_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
+func _API_Unmount_Handler(srv interface{}, ctx context.Context, codec grpc.Codec, buf []byte) (interface{}, error) {
 	in := new(UnmountRequest)
 	if err := codec.Unmarshal(buf, in); err != nil {
 		return nil, err
 	}
-	out, err := srv.(VolumeDriverServer).Unmount(ctx, in)
+	out, err := srv.(APIServer).Unmount(ctx, in)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-var _VolumeDriver_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "dockervolume.VolumeDriver",
-	HandlerType: (*VolumeDriverServer)(nil),
+var _API_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "dockervolume.API",
+	HandlerType: (*APIServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Activate",
-			Handler:    _VolumeDriver_Activate_Handler,
+			Handler:    _API_Activate_Handler,
 		},
 		{
 			MethodName: "Create",
-			Handler:    _VolumeDriver_Create_Handler,
+			Handler:    _API_Create_Handler,
 		},
 		{
 			MethodName: "Remove",
-			Handler:    _VolumeDriver_Remove_Handler,
+			Handler:    _API_Remove_Handler,
 		},
 		{
 			MethodName: "Path",
-			Handler:    _VolumeDriver_Path_Handler,
+			Handler:    _API_Path_Handler,
 		},
 		{
 			MethodName: "Mount",
-			Handler:    _VolumeDriver_Mount_Handler,
+			Handler:    _API_Mount_Handler,
 		},
 		{
 			MethodName: "Unmount",
-			Handler:    _VolumeDriver_Unmount_Handler,
+			Handler:    _API_Unmount_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},

@@ -52,7 +52,7 @@ message UnmountResponse {
   string err = 1;
 }
 
-service VolumeDriver {
+service API {
   rpc Activate(google.protobuf.Empty) returns (ActivateResponse) {
     option (google.api.http) = {
       post: "/Plugin.Activate"

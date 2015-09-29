@@ -25,7 +25,7 @@ var _ = runtime.String
 var _ = json.Marshal
 var _ = utilities.PascalFromSnake
 
-func request_VolumeDriver_Activate_0(ctx context.Context, client VolumeDriverClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
+func request_API_Activate_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq google_protobuf.Empty
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -35,7 +35,7 @@ func request_VolumeDriver_Activate_0(ctx context.Context, client VolumeDriverCli
 	return client.Activate(ctx, &protoReq)
 }
 
-func request_VolumeDriver_Create_0(ctx context.Context, client VolumeDriverClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
+func request_API_Create_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq CreateRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -45,7 +45,7 @@ func request_VolumeDriver_Create_0(ctx context.Context, client VolumeDriverClien
 	return client.Create(ctx, &protoReq)
 }
 
-func request_VolumeDriver_Remove_0(ctx context.Context, client VolumeDriverClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
+func request_API_Remove_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq RemoveRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -55,7 +55,7 @@ func request_VolumeDriver_Remove_0(ctx context.Context, client VolumeDriverClien
 	return client.Remove(ctx, &protoReq)
 }
 
-func request_VolumeDriver_Path_0(ctx context.Context, client VolumeDriverClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
+func request_API_Path_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq PathRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -65,7 +65,7 @@ func request_VolumeDriver_Path_0(ctx context.Context, client VolumeDriverClient,
 	return client.Path(ctx, &protoReq)
 }
 
-func request_VolumeDriver_Mount_0(ctx context.Context, client VolumeDriverClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
+func request_API_Mount_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq MountRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -75,7 +75,7 @@ func request_VolumeDriver_Mount_0(ctx context.Context, client VolumeDriverClient
 	return client.Mount(ctx, &protoReq)
 }
 
-func request_VolumeDriver_Unmount_0(ctx context.Context, client VolumeDriverClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
+func request_API_Unmount_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq UnmountRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
@@ -85,9 +85,9 @@ func request_VolumeDriver_Unmount_0(ctx context.Context, client VolumeDriverClie
 	return client.Unmount(ctx, &protoReq)
 }
 
-// RegisterVolumeDriverHandlerFromEndpoint is same as RegisterVolumeDriverHandler but
+// RegisterAPIHandlerFromEndpoint is same as RegisterAPIHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
-func RegisterVolumeDriverHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string) (err error) {
+func RegisterAPIHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string) (err error) {
 	conn, err := grpc.Dial(endpoint, grpc.WithInsecure())
 	if err != nil {
 		return err
@@ -107,77 +107,77 @@ func RegisterVolumeDriverHandlerFromEndpoint(ctx context.Context, mux *runtime.S
 		}()
 	}()
 
-	return RegisterVolumeDriverHandler(ctx, mux, conn)
+	return RegisterAPIHandler(ctx, mux, conn)
 }
 
-// RegisterVolumeDriverHandler registers the http handlers for service VolumeDriver to "mux".
+// RegisterAPIHandler registers the http handlers for service API to "mux".
 // The handlers forward requests to the grpc endpoint over "conn".
-func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
-	client := NewVolumeDriverClient(conn)
+func RegisterAPIHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
+	client := NewAPIClient(conn)
 
-	mux.Handle("POST", pattern_VolumeDriver_Activate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_VolumeDriver_Activate_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
+	mux.Handle("POST", pattern_API_Activate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		resp, err := request_API_Activate_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, err)
 			return
 		}
 
-		forward_VolumeDriver_Activate_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_API_Activate_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_VolumeDriver_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_VolumeDriver_Create_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
+	mux.Handle("POST", pattern_API_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		resp, err := request_API_Create_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, err)
 			return
 		}
 
-		forward_VolumeDriver_Create_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_API_Create_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_VolumeDriver_Remove_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_VolumeDriver_Remove_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
+	mux.Handle("POST", pattern_API_Remove_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		resp, err := request_API_Remove_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, err)
 			return
 		}
 
-		forward_VolumeDriver_Remove_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_API_Remove_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_VolumeDriver_Path_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_VolumeDriver_Path_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
+	mux.Handle("POST", pattern_API_Path_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		resp, err := request_API_Path_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, err)
 			return
 		}
 
-		forward_VolumeDriver_Path_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_API_Path_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_VolumeDriver_Mount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_VolumeDriver_Mount_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
+	mux.Handle("POST", pattern_API_Mount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		resp, err := request_API_Mount_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, err)
 			return
 		}
 
-		forward_VolumeDriver_Mount_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_API_Mount_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
-	mux.Handle("POST", pattern_VolumeDriver_Unmount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_VolumeDriver_Unmount_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
+	mux.Handle("POST", pattern_API_Unmount_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		resp, err := request_API_Unmount_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
 			runtime.HTTPError(ctx, w, err)
 			return
 		}
 
-		forward_VolumeDriver_Unmount_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_API_Unmount_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -185,29 +185,29 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 }
 
 var (
-	pattern_VolumeDriver_Activate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"Plugin.Activate"}, ""))
+	pattern_API_Activate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"Plugin.Activate"}, ""))
 
-	pattern_VolumeDriver_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Create"}, ""))
+	pattern_API_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Create"}, ""))
 
-	pattern_VolumeDriver_Remove_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Remove"}, ""))
+	pattern_API_Remove_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Remove"}, ""))
 
-	pattern_VolumeDriver_Path_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Path"}, ""))
+	pattern_API_Path_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Path"}, ""))
 
-	pattern_VolumeDriver_Mount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Mount"}, ""))
+	pattern_API_Mount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Mount"}, ""))
 
-	pattern_VolumeDriver_Unmount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Unmount"}, ""))
+	pattern_API_Unmount_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Unmount"}, ""))
 )
 
 var (
-	forward_VolumeDriver_Activate_0 = runtime.ForwardResponseMessage
+	forward_API_Activate_0 = runtime.ForwardResponseMessage
 
-	forward_VolumeDriver_Create_0 = runtime.ForwardResponseMessage
+	forward_API_Create_0 = runtime.ForwardResponseMessage
 
-	forward_VolumeDriver_Remove_0 = runtime.ForwardResponseMessage
+	forward_API_Remove_0 = runtime.ForwardResponseMessage
 
-	forward_VolumeDriver_Path_0 = runtime.ForwardResponseMessage
+	forward_API_Path_0 = runtime.ForwardResponseMessage
 
-	forward_VolumeDriver_Mount_0 = runtime.ForwardResponseMessage
+	forward_API_Mount_0 = runtime.ForwardResponseMessage
 
-	forward_VolumeDriver_Unmount_0 = runtime.ForwardResponseMessage
+	forward_API_Unmount_0 = runtime.ForwardResponseMessage
 )
