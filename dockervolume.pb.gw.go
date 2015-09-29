@@ -122,7 +122,7 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 			return
 		}
 
-		forward_VolumeDriver_Activate_0(ctx, w, req, resp)
+		forward_VolumeDriver_Activate_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -133,7 +133,7 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 			return
 		}
 
-		forward_VolumeDriver_Create_0(ctx, w, req, resp)
+		forward_VolumeDriver_Create_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -144,7 +144,7 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 			return
 		}
 
-		forward_VolumeDriver_Remove_0(ctx, w, req, resp)
+		forward_VolumeDriver_Remove_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -155,7 +155,7 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 			return
 		}
 
-		forward_VolumeDriver_Path_0(ctx, w, req, resp)
+		forward_VolumeDriver_Path_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -166,7 +166,7 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 			return
 		}
 
-		forward_VolumeDriver_Mount_0(ctx, w, req, resp)
+		forward_VolumeDriver_Mount_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -177,7 +177,7 @@ func RegisterVolumeDriverHandler(ctx context.Context, mux *runtime.ServeMux, con
 			return
 		}
 
-		forward_VolumeDriver_Unmount_0(ctx, w, req, resp)
+		forward_VolumeDriver_Unmount_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
