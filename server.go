@@ -13,28 +13,53 @@ import (
 	"google.golang.org/grpc"
 )
 
-func serve(
+const (
+	protocolTCP = iota
+	protocolUnix
+)
+
+type server struct {
+	protocol         int
+	volumeDriver     VolumeDriver
+	volumeDriverName string
+	grpcPort         uint16
+	groupOrAddress   string
+	opts             ServerOptions
+}
+
+func newServer(
+	protocol int,
 	volumeDriver VolumeDriver,
-	protocol Protocol,
 	volumeDriverName string,
-	groupOrAddress string,
 	grpcPort uint16,
-	grpcDebugPort uint16,
-) (retErr error) {
+	groupOrAddress string,
+	opts ServerOptions,
+) *server {
+	return &server{
+		protocol,
+		volumeDriver,
+		volumeDriverName,
+		grpcPort,
+		groupOrAddress,
+		opts,
+	}
+}
+
+func (s *server) Serve() (retErr error) {
 	start := make(chan struct{})
 	var listener net.Listener
 	var spec string
 	var err error
 	var addr string
-	switch protocol {
-	case ProtocolTCP:
-		listener, spec, err = newTCPListener(volumeDriverName, groupOrAddress, start)
-		addr = groupOrAddress
-	case ProtocolUnix:
-		listener, spec, err = newUnixListener(volumeDriverName, groupOrAddress, start)
-		addr = volumeDriverName
+	switch s.protocol {
+	case protocolTCP:
+		listener, spec, err = newTCPListener(s.volumeDriverName, s.groupOrAddress, start)
+		addr = s.groupOrAddress
+	case protocolUnix:
+		listener, spec, err = newUnixListener(s.volumeDriverName, s.groupOrAddress, start)
+		addr = s.volumeDriverName
 	default:
-		return fmt.Errorf("unknown protocol: %v", protocol)
+		return fmt.Errorf("unknown protocol: %d", s.protocol)
 	}
 	if spec != "" {
 		defer func() {
@@ -48,12 +73,12 @@ func serve(
 	}
 	close(start)
 	return protoserver.Serve(
-		grpcPort,
-		func(s *grpc.Server) {
-			RegisterAPIServer(s, newAPIServer(volumeDriver))
+		s.grpcPort,
+		func(grpcServer *grpc.Server) {
+			RegisterAPIServer(grpcServer, newAPIServer(s.volumeDriver))
 		},
 		protoserver.ServeOptions{
-			DebugPort: grpcDebugPort,
+			DebugPort: s.opts.GRPCDebugPort,
 			HTTPRegisterFunc: func(ctx context.Context, mux *runtime.ServeMux, clientConn *grpc.ClientConn) error {
 				return RegisterAPIHandler(ctx, mux, clientConn)
 			},

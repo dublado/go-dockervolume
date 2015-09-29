@@ -2,16 +2,6 @@ package dockervolume // import "go.pedge.io/dockervolume"
 
 import "google.golang.org/grpc"
 
-const (
-	// ProtocolTCP denotes using TCP.
-	ProtocolTCP Protocol = iota
-	// ProtocolUnix denotes using Unix sockets.
-	ProtocolUnix
-)
-
-// Protocol represents TCP or Unix.
-type Protocol int
-
 // VolumeDriver is the interface that should be implemented for custom volume drivers.
 type VolumeDriver interface {
 	// Create a volume with the given name
@@ -36,23 +26,48 @@ func NewVolumeDriverClient(clientConn *grpc.ClientConn) VolumeDriverClient {
 	return newVolumeDriverClient(clientConn)
 }
 
-// Serve serves the VolumeDriver.
-//
-// grpcDebugPort can be 0.
-func Serve(
+// Server serves a VolumeDriver.
+type Server interface {
+	Serve() error
+}
+
+// ServerOptions are options for a Server.
+type ServerOptions struct {
+	GRPCDebugPort uint16
+}
+
+// NewTCPServer returns a new Server for TCP.
+func NewTCPServer(
 	volumeDriver VolumeDriver,
-	protocol Protocol,
 	volumeDriverName string,
-	groupOrAddress string,
 	grpcPort uint16,
-	grpcDebugPort uint16,
-) error {
-	return serve(
+	address string,
+	opts ServerOptions,
+) Server {
+	return newServer(
+		protocolTCP,
 		volumeDriver,
-		protocol,
 		volumeDriverName,
-		groupOrAddress,
 		grpcPort,
-		grpcDebugPort,
+		address,
+		opts,
+	)
+}
+
+// NewUnixServer returns a new Server for Unix sockets.
+func NewUnixServer(
+	volumeDriver VolumeDriver,
+	volumeDriverName string,
+	grpcPort uint16,
+	group string,
+	opts ServerOptions,
+) Server {
+	return newServer(
+		protocolUnix,
+		volumeDriver,
+		volumeDriverName,
+		grpcPort,
+		group,
+		opts,
 	)
 }
