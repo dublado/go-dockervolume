@@ -29,6 +29,16 @@ type VolumeDriverClient interface {
 	Unmount(name string) (err error)
 	// Cleanup all volumes.
 	Cleanup() ([]*RemoveVolumeAttempt, error)
+	// Get a volume by name.
+	GetVolume(name string) (*Volume, error)
+	// List all volumes.
+	ListVolumes() ([]*Volume, error)
+	// Get events by volume name. Note that events are just in a cache,
+	// which will be wiped when there are too many events.
+	GetEventsByVolume(name string) ([]*Event, error)
+	// List all events. Note that events are just in a cache,
+	// which will be wupred when there are too many events.
+	ListEvents() ([]*Event, error)
 }
 
 // NewVolumeDriverClient creates a new VolumeDriverClient for the given APIClient.
