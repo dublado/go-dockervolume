@@ -8,6 +8,7 @@ import (
 
 	"github.com/gengo/grpc-gateway/runtime"
 	"github.com/golang/protobuf/proto"
+	"go.pedge.io/google-protobuf"
 	"go.pedge.io/proto/server"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -96,5 +97,12 @@ func (s *server) Serve() (retErr error) {
 }
 
 func (s *server) cleanup() error {
+	if !s.opts.NoCleanupOnShutdown {
+		_, err := s.apiServer.Cleanup(
+			context.Background(),
+			&google_protobuf.Empty{},
+		)
+		return err
+	}
 	return nil
 }

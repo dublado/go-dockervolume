@@ -43,7 +43,8 @@ type Server interface {
 
 // ServerOptions are options for a Server.
 type ServerOptions struct {
-	GRPCDebugPort uint16
+	GRPCDebugPort       uint16
+	NoCleanupOnShutdown bool
 }
 
 // NewTCPServer returns a new Server for TCP.
