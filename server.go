@@ -38,7 +38,11 @@ func newServer(
 ) *server {
 	return &server{
 		protocol,
-		newAPIServer(volumeDriver, volumeDriverName),
+		newAPIServer(
+			volumeDriver,
+			volumeDriverName,
+			opts.NoEvents,
+		),
 		volumeDriverName,
 		grpcPort,
 		groupOrAddress,

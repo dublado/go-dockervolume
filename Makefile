@@ -40,7 +40,7 @@ lint: testdeps
 	done
 
 vet: testdeps
-	#go vet ./...
+	go vet ./... 2>&1 | grep -v 'not a string in call to Errorf'
 
 errcheck: testdeps
 	go get -v github.com/kisielk/errcheck

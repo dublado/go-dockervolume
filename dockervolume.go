@@ -53,6 +53,7 @@ type Server interface {
 
 // ServerOptions are options for a Server.
 type ServerOptions struct {
+	NoEvents            bool
 	GRPCDebugPort       uint16
 	NoCleanupOnShutdown bool
 }

@@ -25,16 +25,18 @@ type apiServer struct {
 	volumeDriver     VolumeDriver
 	volumeDriverName string
 	nameToVolume     map[string]*Volume
+	noEvents         bool
 	nameToEvents     map[string][]*Event
 	numEvents        int
 	lock             *sync.RWMutex
 }
 
-func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string) *apiServer {
+func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string, noEvents bool) *apiServer {
 	return &apiServer{
 		volumeDriver,
 		volumeDriverName,
 		make(map[string]*Volume),
+		noEvents,
 		make(map[string][]*Event),
 		0,
 		&sync.RWMutex{},
@@ -287,6 +289,9 @@ func (a *apiServer) log(methodName string, request proto.Message, response proto
 
 // assumes write lock acquired
 func (a *apiServer) addEvent(eventType EventType, volume *Volume) {
+	if a.noEvents {
+		return
+	}
 	if a.numEvents >= maxEventsSize {
 		a.nameToEvents = make(map[string][]*Event, 0)
 		a.numEvents = 0
