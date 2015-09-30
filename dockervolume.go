@@ -1,5 +1,10 @@
 package dockervolume // import "go.pedge.io/dockervolume"
 
+const (
+	// DefaultGRPCPort is the default port used for grpc.
+	DefaultGRPCPort uint16 = 2150
+)
+
 // VolumeDriver is the interface that should be implemented for custom volume drivers.
 type VolumeDriver interface {
 	// Create a volume with the given name and opts.
@@ -54,6 +59,7 @@ type Server interface {
 // ServerOptions are options for a Server.
 type ServerOptions struct {
 	NoEvents            bool
+	GRPCPort            uint16
 	GRPCDebugPort       uint16
 	NoCleanupOnShutdown bool
 }
@@ -62,7 +68,6 @@ type ServerOptions struct {
 func NewTCPServer(
 	volumeDriver VolumeDriver,
 	volumeDriverName string,
-	grpcPort uint16,
 	address string,
 	opts ServerOptions,
 ) Server {
@@ -70,7 +75,6 @@ func NewTCPServer(
 		protocolTCP,
 		volumeDriver,
 		volumeDriverName,
-		grpcPort,
 		address,
 		opts,
 	)
@@ -80,7 +84,6 @@ func NewTCPServer(
 func NewUnixServer(
 	volumeDriver VolumeDriver,
 	volumeDriverName string,
-	grpcPort uint16,
 	group string,
 	opts ServerOptions,
 ) Server {
@@ -88,7 +91,6 @@ func NewUnixServer(
 		protocolUnix,
 		volumeDriver,
 		volumeDriverName,
-		grpcPort,
 		group,
 		opts,
 	)

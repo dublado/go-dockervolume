@@ -23,7 +23,6 @@ type server struct {
 	protocol         int
 	apiServer        *apiServer
 	volumeDriverName string
-	grpcPort         uint16
 	groupOrAddress   string
 	opts             ServerOptions
 }
@@ -32,7 +31,6 @@ func newServer(
 	protocol int,
 	volumeDriver VolumeDriver,
 	volumeDriverName string,
-	grpcPort uint16,
 	groupOrAddress string,
 	opts ServerOptions,
 ) *server {
@@ -44,7 +42,6 @@ func newServer(
 			opts.NoEvents,
 		),
 		volumeDriverName,
-		grpcPort,
 		groupOrAddress,
 		opts,
 	}
@@ -69,8 +66,12 @@ func (s *server) Serve() (retErr error) {
 	if err != nil {
 		return err
 	}
+	grpcPort := s.opts.GRPCPort
+	if grpcPort == 0 {
+		grpcPort = DefaultGRPCPort
+	}
 	return protoserver.Serve(
-		s.grpcPort,
+		grpcPort,
 		func(grpcServer *grpc.Server) {
 			RegisterAPIServer(grpcServer, s.apiServer)
 		},
