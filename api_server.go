@@ -10,6 +10,7 @@ import (
 
 	"github.com/fsouza/go-dockerclient"
 	"go.pedge.io/google-protobuf"
+	"go.pedge.io/pkg/map"
 	"go.pedge.io/proto/rpclog"
 	"go.pedge.io/proto/time"
 	"golang.org/x/net/context"
@@ -58,7 +59,7 @@ func (a *apiServer) create(name string, opts map[string]string) error {
 	if _, ok := a.nameToVolume[name]; ok {
 		return fmt.Errorf("dockervolume: volume already created: %s", name)
 	}
-	if err := a.volumeDriver.Create(name, newOpts(opts)); err != nil {
+	if err := a.volumeDriver.Create(name, pkgmap.StringStringMap(opts)); err != nil {
 		return err
 	}
 	a.nameToVolume[name] = volume
@@ -78,7 +79,7 @@ func (a *apiServer) remove(name string) error {
 		return fmt.Errorf("dockervolume: volume does not exist: %s", name)
 	}
 	delete(a.nameToVolume, name)
-	return a.volumeDriver.Remove(volume.Name, newOpts(copyStringStringMap(volume.Opts)), volume.Mountpoint)
+	return a.volumeDriver.Remove(volume.Name, pkgmap.StringStringMap(volume.Opts).Copy(), volume.Mountpoint)
 }
 
 func (a *apiServer) Path(_ context.Context, request *NameRequest) (response *MountpointErrResponse, err error) {
@@ -111,7 +112,7 @@ func (a *apiServer) mount(name string) (string, error) {
 	if volume.Mountpoint != "" {
 		return "", fmt.Errorf("dockervolume: volume already mounted: %s at %s", volume.Name, volume.Mountpoint)
 	}
-	mountpoint, err := a.volumeDriver.Mount(volume.Name, newOpts(copyStringStringMap(volume.Opts)))
+	mountpoint, err := a.volumeDriver.Mount(volume.Name, pkgmap.StringStringMap(volume.Opts).Copy())
 	volume.Mountpoint = mountpoint
 	return mountpoint, err
 }
@@ -133,7 +134,7 @@ func (a *apiServer) unmount(name string) error {
 	}
 	mountpoint := volume.Mountpoint
 	volume.Mountpoint = ""
-	return a.volumeDriver.Unmount(volume.Name, newOpts(copyStringStringMap(volume.Opts)), mountpoint)
+	return a.volumeDriver.Unmount(volume.Name, pkgmap.StringStringMap(volume.Opts).Copy(), mountpoint)
 }
 
 func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (response *Volumes, err error) {
@@ -201,7 +202,7 @@ func (a *apiServer) ListVolumes(_ context.Context, request *google_protobuf.Empt
 }
 
 func fromNameOptsRequest(request *NameOptsRequest) (string, map[string]string) {
-	return request.Name, copyStringStringMap(request.Opts)
+	return request.Name, pkgmap.StringStringMap(request.Opts).Copy()
 }
 
 func fromNameRequest(request *NameRequest) string {
@@ -240,24 +241,13 @@ func doNameToMountpointErr(request *NameRequest, f func(string) (string, error))
 	return toMountpointErrResponse(mountpoint, err)
 }
 
-func copyStringStringMap(m map[string]string) map[string]string {
-	if m == nil {
-		return nil
-	}
-	n := make(map[string]string, len(m))
-	for key, value := range m {
-		n[key] = value
-	}
-	return n
-}
-
 func copyVolume(volume *Volume) *Volume {
 	if volume == nil {
 		return nil
 	}
 	return &Volume{
 		Name:       volume.Name,
-		Opts:       copyStringStringMap(volume.Opts),
+		Opts:       pkgmap.StringStringMap(volume.Opts).Copy(),
 		Mountpoint: volume.Mountpoint,
 	}
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"go.pedge.io/pkg/map"
 	"go.pedge.io/proto/test"
 	"google.golang.org/grpc"
 )
@@ -136,29 +137,29 @@ func newFakeVolumeDriver(t *testing.T) *fakeVolumeDriver {
 	}
 }
 
-func (v *fakeVolumeDriver) Create(name string, opts Opts) error {
+func (v *fakeVolumeDriver) Create(name string, opts pkgmap.StringStringMap) error {
 	v.nameToFakeVolume[name] = &Volume{
 		Name:       name,
-		Opts:       testOpts(opts),
+		Opts:       opts,
 		Mountpoint: "",
 	}
 	v.nameToFakeStatus[name] = fakeStatusCreate
 	return nil
 }
 
-func (v *fakeVolumeDriver) Remove(name string, opts Opts, mountpoint string) error {
+func (v *fakeVolumeDriver) Remove(name string, opts pkgmap.StringStringMap, mountpoint string) error {
 	v.nameToFakeStatus[name] = fakeStatusRemove
 	return nil
 }
 
-func (v *fakeVolumeDriver) Mount(name string, opts Opts) (string, error) {
+func (v *fakeVolumeDriver) Mount(name string, opts pkgmap.StringStringMap) (string, error) {
 	mountpoint := fmt.Sprintf("/mnt/%s", name)
 	v.nameToFakeVolume[name].Mountpoint = mountpoint
 	v.nameToFakeStatus[name] = fakeStatusMount
 	return mountpoint, nil
 }
 
-func (v *fakeVolumeDriver) Unmount(name string, opts Opts, mountpoint string) error {
+func (v *fakeVolumeDriver) Unmount(name string, opts pkgmap.StringStringMap, mountpoint string) error {
 	v.nameToFakeVolume[name].Mountpoint = mountpoint
 	v.nameToFakeStatus[name] = fakeStatusUnmount
 	return nil
@@ -168,11 +169,4 @@ func (v *fakeVolumeDriver) requireStatusEquals(name string, expected fakeStatus)
 	fakeStatus, ok := v.nameToFakeStatus[name]
 	require.True(v.t, ok)
 	require.Equal(v.t, expected, fakeStatus)
-}
-
-func testOpts(o Opts) map[string]string {
-	if o == nil {
-		return nil
-	}
-	return o.(*opts).m
 }
