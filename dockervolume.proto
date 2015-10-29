@@ -15,15 +15,6 @@ message Volumes {
   repeated Volume volume = 1;
 }
 
-message RemoveVolumeAttempt {
-  Volume volume = 1;
-  string err = 2;
-}
-
-message RemoveVolumeAttempts {
-  repeated RemoveVolumeAttempt remove_volume_attempt = 1;
-}
-
 message ActivateResponse {
   repeated string implements = 1;
 }
@@ -75,10 +66,6 @@ message GetVolumeRequest {
   string name = 1;
 }
 
-message GetEventsByVolumeRequest {
-  string volume_name = 1;
-}
-
 service API {
   rpc Activate(google.protobuf.Empty) returns (ActivateResponse) {
     option (google.api.http) = {
@@ -116,7 +103,7 @@ service API {
       body: "*"
     };
   }
-  rpc Cleanup(google.protobuf.Empty) returns (RemoveVolumeAttempts) {
+  rpc Cleanup(google.protobuf.Empty) returns (Volumes) {
     option (google.api.http) = {
       get: "/api/cleanup"
     };

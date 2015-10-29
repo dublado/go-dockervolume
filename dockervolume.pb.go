@@ -53,37 +53,6 @@ func (m *Volumes) GetVolume() []*Volume {
 	return nil
 }
 
-type RemoveVolumeAttempt struct {
-	Volume *Volume `protobuf:"bytes,1,opt,name=volume" json:"volume,omitempty"`
-	Err    string  `protobuf:"bytes,2,opt,name=err" json:"err,omitempty"`
-}
-
-func (m *RemoveVolumeAttempt) Reset()         { *m = RemoveVolumeAttempt{} }
-func (m *RemoveVolumeAttempt) String() string { return proto.CompactTextString(m) }
-func (*RemoveVolumeAttempt) ProtoMessage()    {}
-
-func (m *RemoveVolumeAttempt) GetVolume() *Volume {
-	if m != nil {
-		return m.Volume
-	}
-	return nil
-}
-
-type RemoveVolumeAttempts struct {
-	RemoveVolumeAttempt []*RemoveVolumeAttempt `protobuf:"bytes,1,rep,name=remove_volume_attempt" json:"remove_volume_attempt,omitempty"`
-}
-
-func (m *RemoveVolumeAttempts) Reset()         { *m = RemoveVolumeAttempts{} }
-func (m *RemoveVolumeAttempts) String() string { return proto.CompactTextString(m) }
-func (*RemoveVolumeAttempts) ProtoMessage()    {}
-
-func (m *RemoveVolumeAttempts) GetRemoveVolumeAttempt() []*RemoveVolumeAttempt {
-	if m != nil {
-		return m.RemoveVolumeAttempt
-	}
-	return nil
-}
-
 type ActivateResponse struct {
 	Implements []string `protobuf:"bytes,1,rep,name=implements" json:"implements,omitempty"`
 }
@@ -190,14 +159,6 @@ func (m *GetVolumeRequest) Reset()         { *m = GetVolumeRequest{} }
 func (m *GetVolumeRequest) String() string { return proto.CompactTextString(m) }
 func (*GetVolumeRequest) ProtoMessage()    {}
 
-type GetEventsByVolumeRequest struct {
-	VolumeName string `protobuf:"bytes,1,opt,name=volume_name" json:"volume_name,omitempty"`
-}
-
-func (m *GetEventsByVolumeRequest) Reset()         { *m = GetEventsByVolumeRequest{} }
-func (m *GetEventsByVolumeRequest) String() string { return proto.CompactTextString(m) }
-func (*GetEventsByVolumeRequest) ProtoMessage()    {}
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConn
@@ -211,7 +172,7 @@ type APIClient interface {
 	Path(ctx context.Context, in *PathRequest, opts ...grpc.CallOption) (*PathResponse, error)
 	Mount(ctx context.Context, in *MountRequest, opts ...grpc.CallOption) (*MountResponse, error)
 	Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error)
-	Cleanup(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*RemoveVolumeAttempts, error)
+	Cleanup(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Volumes, error)
 	GetVolume(ctx context.Context, in *GetVolumeRequest, opts ...grpc.CallOption) (*Volume, error)
 	ListVolumes(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Volumes, error)
 }
@@ -278,8 +239,8 @@ func (c *aPIClient) Unmount(ctx context.Context, in *UnmountRequest, opts ...grp
 	return out, nil
 }
 
-func (c *aPIClient) Cleanup(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*RemoveVolumeAttempts, error) {
-	out := new(RemoveVolumeAttempts)
+func (c *aPIClient) Cleanup(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Volumes, error) {
+	out := new(Volumes)
 	err := grpc.Invoke(ctx, "/dockervolume.API/Cleanup", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -314,7 +275,7 @@ type APIServer interface {
 	Path(context.Context, *PathRequest) (*PathResponse, error)
 	Mount(context.Context, *MountRequest) (*MountResponse, error)
 	Unmount(context.Context, *UnmountRequest) (*UnmountResponse, error)
-	Cleanup(context.Context, *google_protobuf1.Empty) (*RemoveVolumeAttempts, error)
+	Cleanup(context.Context, *google_protobuf1.Empty) (*Volumes, error)
 	GetVolume(context.Context, *GetVolumeRequest) (*Volume, error)
 	ListVolumes(context.Context, *google_protobuf1.Empty) (*Volumes, error)
 }

@@ -97,15 +97,15 @@ func (v *volumeDriverClient) Unmount(name string) error {
 	return nil
 }
 
-func (v *volumeDriverClient) Cleanup() ([]*RemoveVolumeAttempt, error) {
+func (v *volumeDriverClient) Cleanup() ([]*Volume, error) {
 	response, err := v.apiClient.Cleanup(
 		context.Background(),
-		&google_protobuf.Empty{},
+		google_protobuf.EmptyInstance,
 	)
 	if err != nil {
 		return nil, err
 	}
-	return response.RemoveVolumeAttempt, nil
+	return response.Volume, nil
 }
 
 func (v *volumeDriverClient) GetVolume(name string) (*Volume, error) {
@@ -120,7 +120,7 @@ func (v *volumeDriverClient) GetVolume(name string) (*Volume, error) {
 func (v *volumeDriverClient) ListVolumes() ([]*Volume, error) {
 	response, err := v.apiClient.ListVolumes(
 		context.Background(),
-		&google_protobuf.Empty{},
+		google_protobuf.EmptyInstance,
 	)
 	if err != nil {
 		return nil, err

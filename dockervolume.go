@@ -41,7 +41,7 @@ type VolumeDriverClient interface {
 	// Unmount the given volume.
 	Unmount(name string) (err error)
 	// Cleanup all volumes.
-	Cleanup() ([]*RemoveVolumeAttempt, error)
+	Cleanup() ([]*Volume, error)
 	// Get a volume by name.
 	GetVolume(name string) (*Volume, error)
 	// List all volumes.

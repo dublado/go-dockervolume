@@ -152,7 +152,7 @@ func (a *apiServer) Unmount(_ context.Context, request *UnmountRequest) (respons
 	return &UnmountResponse{}, nil
 }
 
-func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (response *RemoveVolumeAttempts, err error) {
+func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (response *Volumes, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	client, err := docker.NewClientFromEnv()
 	if err != nil {
@@ -172,23 +172,22 @@ func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (
 	a.lock.RLock()
 	for _, dockerVolume := range driverVolumes {
 		if volume, ok := a.nameToVolume[dockerVolume.Name]; ok {
-			volumes = append(volumes, volume)
+			volumes = append(volumes, copyVolume(volume))
 		}
 	}
 	a.lock.RUnlock()
-	removeVolumeAttempts := make([]*RemoveVolumeAttempt, len(volumes))
-	for i, volume := range volumes {
-		removeVolumeAttempt := &RemoveVolumeAttempt{
-			Volume: copyVolume(volume),
-		}
+	var errs []error
+	for _, volume := range volumes {
 		if err := client.RemoveVolume(volume.Name); err != nil {
-			removeVolumeAttempt.Err = err.Error()
+			errs = append(errs, err)
 		}
-		removeVolumeAttempts[i] = removeVolumeAttempt
 	}
-	return &RemoveVolumeAttempts{
-		RemoveVolumeAttempt: removeVolumeAttempts,
-	}, nil
+	if len(errs) > 0 {
+		err = grpc.Errorf(codes.Internal, "%v", errs)
+	}
+	return &Volumes{
+		Volume: volumes,
+	}, err
 }
 
 func (a *apiServer) GetVolume(_ context.Context, request *GetVolumeRequest) (response *Volume, err error) {
