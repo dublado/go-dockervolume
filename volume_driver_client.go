@@ -127,27 +127,3 @@ func (v *volumeDriverClient) ListVolumes() ([]*Volume, error) {
 	}
 	return response.Volume, nil
 }
-
-func (v *volumeDriverClient) GetEventsByVolume(name string) ([]*Event, error) {
-	response, err := v.apiClient.GetEventsByVolume(
-		context.Background(),
-		&GetEventsByVolumeRequest{
-			VolumeName: name,
-		},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return response.Event, nil
-}
-
-func (v *volumeDriverClient) ListEvents() ([]*Event, error) {
-	response, err := v.apiClient.ListEvents(
-		context.Background(),
-		&google_protobuf.Empty{},
-	)
-	if err != nil {
-		return nil, err
-	}
-	return response.Event, nil
-}

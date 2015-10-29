@@ -121,36 +121,6 @@ func request_API_ListVolumes_0(ctx context.Context, client APIClient, req *http.
 	return client.ListVolumes(ctx, &protoReq)
 }
 
-func request_API_GetEventsByVolume_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq GetEventsByVolumeRequest
-
-	var (
-		val string
-		ok  bool
-		err error
-		_   = err
-	)
-
-	val, ok = pathParams["volume_name"]
-	if !ok {
-		return nil, grpc.Errorf(codes.InvalidArgument, "missing parameter %s", "volume_name")
-	}
-
-	protoReq.VolumeName, err = runtime.String(val)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return client.GetEventsByVolume(ctx, &protoReq)
-}
-
-func request_API_ListEvents_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq google_protobuf.Empty
-
-	return client.ListEvents(ctx, &protoReq)
-}
-
 // RegisterAPIHandlerFromEndpoint is same as RegisterAPIHandler but
 // automatically dials to "endpoint" and closes the connection when "ctx" gets done.
 func RegisterAPIHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, endpoint string) (err error) {
@@ -280,28 +250,6 @@ func RegisterAPIHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.C
 
 	})
 
-	mux.Handle("GET", pattern_API_GetEventsByVolume_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_API_GetEventsByVolume_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
-		if err != nil {
-			runtime.HTTPError(ctx, w, err)
-			return
-		}
-
-		forward_API_GetEventsByVolume_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
-	mux.Handle("GET", pattern_API_ListEvents_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_API_ListEvents_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
-		if err != nil {
-			runtime.HTTPError(ctx, w, err)
-			return
-		}
-
-		forward_API_ListEvents_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	return nil
 }
 
@@ -323,10 +271,6 @@ var (
 	pattern_API_GetVolume_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"api", "volumes", "name"}, ""))
 
 	pattern_API_ListVolumes_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api", "volumes"}, ""))
-
-	pattern_API_GetEventsByVolume_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"api", "events", "volume_name"}, ""))
-
-	pattern_API_ListEvents_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1}, []string{"api", "events"}, ""))
 )
 
 var (
@@ -347,8 +291,4 @@ var (
 	forward_API_GetVolume_0 = runtime.ForwardResponseMessage
 
 	forward_API_ListVolumes_0 = runtime.ForwardResponseMessage
-
-	forward_API_GetEventsByVolume_0 = runtime.ForwardResponseMessage
-
-	forward_API_ListEvents_0 = runtime.ForwardResponseMessage
 )

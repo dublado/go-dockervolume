@@ -10,7 +10,6 @@ import math "math"
 
 // discarding unused import google_api1 "google/api"
 import google_protobuf1 "go.pedge.io/google-protobuf"
-import google_protobuf2 "go.pedge.io/google-protobuf"
 
 import (
 	context "golang.org/x/net/context"
@@ -21,35 +20,6 @@ import (
 var _ = proto.Marshal
 var _ = fmt.Errorf
 var _ = math.Inf
-
-type EventType int32
-
-const (
-	EventType_EVENT_TYPE_NONE      EventType = 0
-	EventType_EVENT_TYPE_CREATED   EventType = 1
-	EventType_EVENT_TYPE_REMOVED   EventType = 2
-	EventType_EVENT_TYPE_MOUNTED   EventType = 3
-	EventType_EVENT_TYPE_UNMOUNTED EventType = 4
-)
-
-var EventType_name = map[int32]string{
-	0: "EVENT_TYPE_NONE",
-	1: "EVENT_TYPE_CREATED",
-	2: "EVENT_TYPE_REMOVED",
-	3: "EVENT_TYPE_MOUNTED",
-	4: "EVENT_TYPE_UNMOUNTED",
-}
-var EventType_value = map[string]int32{
-	"EVENT_TYPE_NONE":      0,
-	"EVENT_TYPE_CREATED":   1,
-	"EVENT_TYPE_REMOVED":   2,
-	"EVENT_TYPE_MOUNTED":   3,
-	"EVENT_TYPE_UNMOUNTED": 4,
-}
-
-func (x EventType) String() string {
-	return proto.EnumName(EventType_name, int32(x))
-}
 
 type Volume struct {
 	Name       string            `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -79,45 +49,6 @@ func (*Volumes) ProtoMessage()    {}
 func (m *Volumes) GetVolume() []*Volume {
 	if m != nil {
 		return m.Volume
-	}
-	return nil
-}
-
-type Event struct {
-	EventType EventType                   `protobuf:"varint,1,opt,name=event_type,enum=dockervolume.EventType" json:"event_type,omitempty"`
-	Volume    *Volume                     `protobuf:"bytes,2,opt,name=volume" json:"volume,omitempty"`
-	Timestamp *google_protobuf2.Timestamp `protobuf:"bytes,3,opt,name=timestamp" json:"timestamp,omitempty"`
-}
-
-func (m *Event) Reset()         { *m = Event{} }
-func (m *Event) String() string { return proto.CompactTextString(m) }
-func (*Event) ProtoMessage()    {}
-
-func (m *Event) GetVolume() *Volume {
-	if m != nil {
-		return m.Volume
-	}
-	return nil
-}
-
-func (m *Event) GetTimestamp() *google_protobuf2.Timestamp {
-	if m != nil {
-		return m.Timestamp
-	}
-	return nil
-}
-
-type Events struct {
-	Event []*Event `protobuf:"bytes,1,rep,name=event" json:"event,omitempty"`
-}
-
-func (m *Events) Reset()         { *m = Events{} }
-func (m *Events) String() string { return proto.CompactTextString(m) }
-func (*Events) ProtoMessage()    {}
-
-func (m *Events) GetEvent() []*Event {
-	if m != nil {
-		return m.Event
 	}
 	return nil
 }
@@ -267,10 +198,6 @@ func (m *GetEventsByVolumeRequest) Reset()         { *m = GetEventsByVolumeReque
 func (m *GetEventsByVolumeRequest) String() string { return proto.CompactTextString(m) }
 func (*GetEventsByVolumeRequest) ProtoMessage()    {}
 
-func init() {
-	proto.RegisterEnum("dockervolume.EventType", EventType_name, EventType_value)
-}
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
 var _ grpc.ClientConn
@@ -287,8 +214,6 @@ type APIClient interface {
 	Cleanup(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*RemoveVolumeAttempts, error)
 	GetVolume(ctx context.Context, in *GetVolumeRequest, opts ...grpc.CallOption) (*Volume, error)
 	ListVolumes(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Volumes, error)
-	GetEventsByVolume(ctx context.Context, in *GetEventsByVolumeRequest, opts ...grpc.CallOption) (*Events, error)
-	ListEvents(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Events, error)
 }
 
 type aPIClient struct {
@@ -380,24 +305,6 @@ func (c *aPIClient) ListVolumes(ctx context.Context, in *google_protobuf1.Empty,
 	return out, nil
 }
 
-func (c *aPIClient) GetEventsByVolume(ctx context.Context, in *GetEventsByVolumeRequest, opts ...grpc.CallOption) (*Events, error) {
-	out := new(Events)
-	err := grpc.Invoke(ctx, "/dockervolume.API/GetEventsByVolume", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *aPIClient) ListEvents(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Events, error) {
-	out := new(Events)
-	err := grpc.Invoke(ctx, "/dockervolume.API/ListEvents", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // Server API for API service
 
 type APIServer interface {
@@ -410,8 +317,6 @@ type APIServer interface {
 	Cleanup(context.Context, *google_protobuf1.Empty) (*RemoveVolumeAttempts, error)
 	GetVolume(context.Context, *GetVolumeRequest) (*Volume, error)
 	ListVolumes(context.Context, *google_protobuf1.Empty) (*Volumes, error)
-	GetEventsByVolume(context.Context, *GetEventsByVolumeRequest) (*Events, error)
-	ListEvents(context.Context, *google_protobuf1.Empty) (*Events, error)
 }
 
 func RegisterAPIServer(s *grpc.Server, srv APIServer) {
@@ -526,30 +431,6 @@ func _API_ListVolumes_Handler(srv interface{}, ctx context.Context, dec func(int
 	return out, nil
 }
 
-func _API_GetEventsByVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(GetEventsByVolumeRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(APIServer).GetEventsByVolume(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func _API_ListEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(google_protobuf1.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(APIServer).ListEvents(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 var _API_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "dockervolume.API",
 	HandlerType: (*APIServer)(nil),
@@ -589,14 +470,6 @@ var _API_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListVolumes",
 			Handler:    _API_ListVolumes_Handler,
-		},
-		{
-			MethodName: "GetEventsByVolume",
-			Handler:    _API_GetEventsByVolume_Handler,
-		},
-		{
-			MethodName: "ListEvents",
-			Handler:    _API_ListEvents_Handler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},
