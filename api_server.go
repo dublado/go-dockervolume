@@ -9,7 +9,6 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/fsouza/go-dockerclient"
-	"github.com/golang/protobuf/proto"
 	"go.pedge.io/google-protobuf"
 	"go.pedge.io/proto/rpclog"
 	"go.pedge.io/proto/time"
@@ -17,6 +16,7 @@ import (
 )
 
 type apiServer struct {
+	protorpclog.Logger
 	volumeDriver     VolumeDriver
 	volumeDriverName string
 	nameToVolume     map[string]*Volume
@@ -25,6 +25,7 @@ type apiServer struct {
 
 func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string, noEvents bool) *apiServer {
 	return &apiServer{
+		protorpclog.NewLogger("dockervolume.API"),
 		volumeDriver,
 		volumeDriverName,
 		make(map[string]*Volume),
@@ -33,8 +34,7 @@ func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string, noEvents b
 }
 
 func (a *apiServer) Activate(_ context.Context, request *google_protobuf.Empty) (response *ActivateResponse, err error) {
-	start := time.Now()
-	defer func() { a.log("Activate", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	return &ActivateResponse{
 		Implements: []string{
 			"VolumeDriver",
@@ -43,8 +43,7 @@ func (a *apiServer) Activate(_ context.Context, request *google_protobuf.Empty) 
 }
 
 func (a *apiServer) Create(_ context.Context, request *CreateRequest) (response *CreateResponse, err error) {
-	start := time.Now()
-	defer func() { a.log("Create", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	volume := &Volume{
 		request.Name,
 		request.Opts,
@@ -67,8 +66,7 @@ func (a *apiServer) Create(_ context.Context, request *CreateRequest) (response 
 }
 
 func (a *apiServer) Remove(_ context.Context, request *RemoveRequest) (response *RemoveResponse, err error) {
-	start := time.Now()
-	defer func() { a.log("Remove", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.Lock()
 	defer a.lock.Unlock()
 	volume, ok := a.nameToVolume[request.Name]
@@ -87,8 +85,7 @@ func (a *apiServer) Remove(_ context.Context, request *RemoveRequest) (response 
 }
 
 func (a *apiServer) Path(_ context.Context, request *PathRequest) (response *PathResponse, err error) {
-	start := time.Now()
-	defer func() { a.log("Path", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.RLock()
 	defer a.lock.RUnlock()
 	volume, ok := a.nameToVolume[request.Name]
@@ -103,8 +100,7 @@ func (a *apiServer) Path(_ context.Context, request *PathRequest) (response *Pat
 }
 
 func (a *apiServer) Mount(_ context.Context, request *MountRequest) (response *MountResponse, err error) {
-	start := time.Now()
-	defer func() { a.log("Mount", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.Lock()
 	defer a.lock.Unlock()
 	volume, ok := a.nameToVolume[request.Name]
@@ -132,8 +128,7 @@ func (a *apiServer) Mount(_ context.Context, request *MountRequest) (response *M
 }
 
 func (a *apiServer) Unmount(_ context.Context, request *UnmountRequest) (response *UnmountResponse, err error) {
-	start := time.Now()
-	defer func() { a.log("Unmount", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.Lock()
 	defer a.lock.Unlock()
 	volume, ok := a.nameToVolume[request.Name]
@@ -158,8 +153,7 @@ func (a *apiServer) Unmount(_ context.Context, request *UnmountRequest) (respons
 }
 
 func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (response *RemoveVolumeAttempts, err error) {
-	start := time.Now()
-	defer func() { a.log("Cleanup", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	client, err := docker.NewClientFromEnv()
 	if err != nil {
 		return nil, err
@@ -198,8 +192,7 @@ func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (
 }
 
 func (a *apiServer) GetVolume(_ context.Context, request *GetVolumeRequest) (response *Volume, err error) {
-	start := time.Now()
-	defer func() { a.log("GetVolume", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.RLock()
 	defer a.lock.RUnlock()
 	volume, ok := a.nameToVolume[request.Name]
@@ -210,8 +203,7 @@ func (a *apiServer) GetVolume(_ context.Context, request *GetVolumeRequest) (res
 }
 
 func (a *apiServer) ListVolumes(_ context.Context, request *google_protobuf.Empty) (response *Volumes, err error) {
-	start := time.Now()
-	defer func() { a.log("ListVolumes", request, response, err, start) }()
+	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.RLock()
 	defer a.lock.RUnlock()
 	volumes := make([]*Volume, len(a.nameToVolume))
@@ -223,10 +215,6 @@ func (a *apiServer) ListVolumes(_ context.Context, request *google_protobuf.Empt
 	return &Volumes{
 		Volume: volumes,
 	}, nil
-}
-
-func (a *apiServer) log(methodName string, request proto.Message, response proto.Message, err error, start time.Time) {
-	protorpclog.Info("dockervolume.API", methodName, request, response, err, time.Since(start))
 }
 
 func copyStringStringMap(m map[string]string) map[string]string {
