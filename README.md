@@ -11,7 +11,7 @@ A small library taking care of the generic code for docker volume plugins writte
 
 This libary was originally inspired by https://github.com/calavera/dkvolume.
 
-Note that most of my work now is going toward the [Open Storage Project][https://github.com/libopenstorage],
+Note that most of my work now is going toward the [Open Storage Project](https://github.com/libopenstorage),
 however this package is basically feature complete for the current docker volume plugin API.
 
 ### Usage
