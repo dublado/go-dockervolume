@@ -53,6 +53,30 @@ func (m *Volumes) GetVolume() []*Volume {
 	return nil
 }
 
+type NameOptsRequest struct {
+	Name string            `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+	Opts map[string]string `protobuf:"bytes,2,rep,name=opts" json:"opts,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+}
+
+func (m *NameOptsRequest) Reset()         { *m = NameOptsRequest{} }
+func (m *NameOptsRequest) String() string { return proto.CompactTextString(m) }
+func (*NameOptsRequest) ProtoMessage()    {}
+
+func (m *NameOptsRequest) GetOpts() map[string]string {
+	if m != nil {
+		return m.Opts
+	}
+	return nil
+}
+
+type NameRequest struct {
+	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
+}
+
+func (m *NameRequest) Reset()         { *m = NameRequest{} }
+func (m *NameRequest) String() string { return proto.CompactTextString(m) }
+func (*NameRequest) ProtoMessage()    {}
+
 type ActivateResponse struct {
 	Implements []string `protobuf:"bytes,1,rep,name=implements" json:"implements,omitempty"`
 }
@@ -61,103 +85,22 @@ func (m *ActivateResponse) Reset()         { *m = ActivateResponse{} }
 func (m *ActivateResponse) String() string { return proto.CompactTextString(m) }
 func (*ActivateResponse) ProtoMessage()    {}
 
-type CreateRequest struct {
-	Name string            `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Opts map[string]string `protobuf:"bytes,2,rep,name=opts" json:"opts,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-}
-
-func (m *CreateRequest) Reset()         { *m = CreateRequest{} }
-func (m *CreateRequest) String() string { return proto.CompactTextString(m) }
-func (*CreateRequest) ProtoMessage()    {}
-
-func (m *CreateRequest) GetOpts() map[string]string {
-	if m != nil {
-		return m.Opts
-	}
-	return nil
-}
-
-type CreateResponse struct {
+type ErrResponse struct {
 	Err string `protobuf:"bytes,1,opt,name=err" json:"err,omitempty"`
 }
 
-func (m *CreateResponse) Reset()         { *m = CreateResponse{} }
-func (m *CreateResponse) String() string { return proto.CompactTextString(m) }
-func (*CreateResponse) ProtoMessage()    {}
+func (m *ErrResponse) Reset()         { *m = ErrResponse{} }
+func (m *ErrResponse) String() string { return proto.CompactTextString(m) }
+func (*ErrResponse) ProtoMessage()    {}
 
-type RemoveRequest struct {
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-}
-
-func (m *RemoveRequest) Reset()         { *m = RemoveRequest{} }
-func (m *RemoveRequest) String() string { return proto.CompactTextString(m) }
-func (*RemoveRequest) ProtoMessage()    {}
-
-type RemoveResponse struct {
-	Err string `protobuf:"bytes,1,opt,name=err" json:"err,omitempty"`
-}
-
-func (m *RemoveResponse) Reset()         { *m = RemoveResponse{} }
-func (m *RemoveResponse) String() string { return proto.CompactTextString(m) }
-func (*RemoveResponse) ProtoMessage()    {}
-
-type PathRequest struct {
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-}
-
-func (m *PathRequest) Reset()         { *m = PathRequest{} }
-func (m *PathRequest) String() string { return proto.CompactTextString(m) }
-func (*PathRequest) ProtoMessage()    {}
-
-type PathResponse struct {
+type MountpointErrResponse struct {
 	Mountpoint string `protobuf:"bytes,1,opt,name=mountpoint" json:"mountpoint,omitempty"`
 	Err        string `protobuf:"bytes,2,opt,name=err" json:"err,omitempty"`
 }
 
-func (m *PathResponse) Reset()         { *m = PathResponse{} }
-func (m *PathResponse) String() string { return proto.CompactTextString(m) }
-func (*PathResponse) ProtoMessage()    {}
-
-type MountRequest struct {
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-}
-
-func (m *MountRequest) Reset()         { *m = MountRequest{} }
-func (m *MountRequest) String() string { return proto.CompactTextString(m) }
-func (*MountRequest) ProtoMessage()    {}
-
-type MountResponse struct {
-	Mountpoint string `protobuf:"bytes,1,opt,name=mountpoint" json:"mountpoint,omitempty"`
-	Err        string `protobuf:"bytes,2,opt,name=err" json:"err,omitempty"`
-}
-
-func (m *MountResponse) Reset()         { *m = MountResponse{} }
-func (m *MountResponse) String() string { return proto.CompactTextString(m) }
-func (*MountResponse) ProtoMessage()    {}
-
-type UnmountRequest struct {
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-}
-
-func (m *UnmountRequest) Reset()         { *m = UnmountRequest{} }
-func (m *UnmountRequest) String() string { return proto.CompactTextString(m) }
-func (*UnmountRequest) ProtoMessage()    {}
-
-type UnmountResponse struct {
-	Err string `protobuf:"bytes,1,opt,name=err" json:"err,omitempty"`
-}
-
-func (m *UnmountResponse) Reset()         { *m = UnmountResponse{} }
-func (m *UnmountResponse) String() string { return proto.CompactTextString(m) }
-func (*UnmountResponse) ProtoMessage()    {}
-
-type GetVolumeRequest struct {
-	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-}
-
-func (m *GetVolumeRequest) Reset()         { *m = GetVolumeRequest{} }
-func (m *GetVolumeRequest) String() string { return proto.CompactTextString(m) }
-func (*GetVolumeRequest) ProtoMessage()    {}
+func (m *MountpointErrResponse) Reset()         { *m = MountpointErrResponse{} }
+func (m *MountpointErrResponse) String() string { return proto.CompactTextString(m) }
+func (*MountpointErrResponse) ProtoMessage()    {}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -167,13 +110,13 @@ var _ grpc.ClientConn
 
 type APIClient interface {
 	Activate(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*ActivateResponse, error)
-	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
-	Remove(ctx context.Context, in *RemoveRequest, opts ...grpc.CallOption) (*RemoveResponse, error)
-	Path(ctx context.Context, in *PathRequest, opts ...grpc.CallOption) (*PathResponse, error)
-	Mount(ctx context.Context, in *MountRequest, opts ...grpc.CallOption) (*MountResponse, error)
-	Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error)
+	Create(ctx context.Context, in *NameOptsRequest, opts ...grpc.CallOption) (*ErrResponse, error)
+	Remove(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*ErrResponse, error)
+	Path(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*MountpointErrResponse, error)
+	Mount(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*MountpointErrResponse, error)
+	Unmount(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*ErrResponse, error)
 	Cleanup(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Volumes, error)
-	GetVolume(ctx context.Context, in *GetVolumeRequest, opts ...grpc.CallOption) (*Volume, error)
+	GetVolume(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*Volume, error)
 	ListVolumes(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*Volumes, error)
 }
 
@@ -194,8 +137,8 @@ func (c *aPIClient) Activate(ctx context.Context, in *google_protobuf1.Empty, op
 	return out, nil
 }
 
-func (c *aPIClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
-	out := new(CreateResponse)
+func (c *aPIClient) Create(ctx context.Context, in *NameOptsRequest, opts ...grpc.CallOption) (*ErrResponse, error) {
+	out := new(ErrResponse)
 	err := grpc.Invoke(ctx, "/dockervolume.API/Create", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -203,8 +146,8 @@ func (c *aPIClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.
 	return out, nil
 }
 
-func (c *aPIClient) Remove(ctx context.Context, in *RemoveRequest, opts ...grpc.CallOption) (*RemoveResponse, error) {
-	out := new(RemoveResponse)
+func (c *aPIClient) Remove(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*ErrResponse, error) {
+	out := new(ErrResponse)
 	err := grpc.Invoke(ctx, "/dockervolume.API/Remove", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -212,8 +155,8 @@ func (c *aPIClient) Remove(ctx context.Context, in *RemoveRequest, opts ...grpc.
 	return out, nil
 }
 
-func (c *aPIClient) Path(ctx context.Context, in *PathRequest, opts ...grpc.CallOption) (*PathResponse, error) {
-	out := new(PathResponse)
+func (c *aPIClient) Path(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*MountpointErrResponse, error) {
+	out := new(MountpointErrResponse)
 	err := grpc.Invoke(ctx, "/dockervolume.API/Path", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -221,8 +164,8 @@ func (c *aPIClient) Path(ctx context.Context, in *PathRequest, opts ...grpc.Call
 	return out, nil
 }
 
-func (c *aPIClient) Mount(ctx context.Context, in *MountRequest, opts ...grpc.CallOption) (*MountResponse, error) {
-	out := new(MountResponse)
+func (c *aPIClient) Mount(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*MountpointErrResponse, error) {
+	out := new(MountpointErrResponse)
 	err := grpc.Invoke(ctx, "/dockervolume.API/Mount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -230,8 +173,8 @@ func (c *aPIClient) Mount(ctx context.Context, in *MountRequest, opts ...grpc.Ca
 	return out, nil
 }
 
-func (c *aPIClient) Unmount(ctx context.Context, in *UnmountRequest, opts ...grpc.CallOption) (*UnmountResponse, error) {
-	out := new(UnmountResponse)
+func (c *aPIClient) Unmount(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*ErrResponse, error) {
+	out := new(ErrResponse)
 	err := grpc.Invoke(ctx, "/dockervolume.API/Unmount", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
@@ -248,7 +191,7 @@ func (c *aPIClient) Cleanup(ctx context.Context, in *google_protobuf1.Empty, opt
 	return out, nil
 }
 
-func (c *aPIClient) GetVolume(ctx context.Context, in *GetVolumeRequest, opts ...grpc.CallOption) (*Volume, error) {
+func (c *aPIClient) GetVolume(ctx context.Context, in *NameRequest, opts ...grpc.CallOption) (*Volume, error) {
 	out := new(Volume)
 	err := grpc.Invoke(ctx, "/dockervolume.API/GetVolume", in, out, c.cc, opts...)
 	if err != nil {
@@ -270,13 +213,13 @@ func (c *aPIClient) ListVolumes(ctx context.Context, in *google_protobuf1.Empty,
 
 type APIServer interface {
 	Activate(context.Context, *google_protobuf1.Empty) (*ActivateResponse, error)
-	Create(context.Context, *CreateRequest) (*CreateResponse, error)
-	Remove(context.Context, *RemoveRequest) (*RemoveResponse, error)
-	Path(context.Context, *PathRequest) (*PathResponse, error)
-	Mount(context.Context, *MountRequest) (*MountResponse, error)
-	Unmount(context.Context, *UnmountRequest) (*UnmountResponse, error)
+	Create(context.Context, *NameOptsRequest) (*ErrResponse, error)
+	Remove(context.Context, *NameRequest) (*ErrResponse, error)
+	Path(context.Context, *NameRequest) (*MountpointErrResponse, error)
+	Mount(context.Context, *NameRequest) (*MountpointErrResponse, error)
+	Unmount(context.Context, *NameRequest) (*ErrResponse, error)
 	Cleanup(context.Context, *google_protobuf1.Empty) (*Volumes, error)
-	GetVolume(context.Context, *GetVolumeRequest) (*Volume, error)
+	GetVolume(context.Context, *NameRequest) (*Volume, error)
 	ListVolumes(context.Context, *google_protobuf1.Empty) (*Volumes, error)
 }
 
@@ -297,7 +240,7 @@ func _API_Activate_Handler(srv interface{}, ctx context.Context, dec func(interf
 }
 
 func _API_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(CreateRequest)
+	in := new(NameOptsRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -309,7 +252,7 @@ func _API_Create_Handler(srv interface{}, ctx context.Context, dec func(interfac
 }
 
 func _API_Remove_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(RemoveRequest)
+	in := new(NameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -321,7 +264,7 @@ func _API_Remove_Handler(srv interface{}, ctx context.Context, dec func(interfac
 }
 
 func _API_Path_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(PathRequest)
+	in := new(NameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -333,7 +276,7 @@ func _API_Path_Handler(srv interface{}, ctx context.Context, dec func(interface{
 }
 
 func _API_Mount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(MountRequest)
+	in := new(NameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -345,7 +288,7 @@ func _API_Mount_Handler(srv interface{}, ctx context.Context, dec func(interface
 }
 
 func _API_Unmount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(UnmountRequest)
+	in := new(NameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -369,7 +312,7 @@ func _API_Cleanup_Handler(srv interface{}, ctx context.Context, dec func(interfa
 }
 
 func _API_GetVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(GetVolumeRequest)
+	in := new(NameRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}

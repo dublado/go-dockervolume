@@ -36,7 +36,7 @@ func request_API_Activate_0(ctx context.Context, client APIClient, req *http.Req
 }
 
 func request_API_Create_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq CreateRequest
+	var protoReq NameOptsRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
@@ -46,7 +46,7 @@ func request_API_Create_0(ctx context.Context, client APIClient, req *http.Reque
 }
 
 func request_API_Remove_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq RemoveRequest
+	var protoReq NameRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
@@ -56,7 +56,7 @@ func request_API_Remove_0(ctx context.Context, client APIClient, req *http.Reque
 }
 
 func request_API_Path_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq PathRequest
+	var protoReq NameRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
@@ -66,7 +66,7 @@ func request_API_Path_0(ctx context.Context, client APIClient, req *http.Request
 }
 
 func request_API_Mount_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq MountRequest
+	var protoReq NameRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
@@ -76,7 +76,7 @@ func request_API_Mount_0(ctx context.Context, client APIClient, req *http.Reques
 }
 
 func request_API_Unmount_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq UnmountRequest
+	var protoReq NameRequest
 
 	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
 		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
@@ -92,7 +92,7 @@ func request_API_Cleanup_0(ctx context.Context, client APIClient, req *http.Requ
 }
 
 func request_API_GetVolume_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq GetVolumeRequest
+	var protoReq NameRequest
 
 	var (
 		val string

@@ -42,114 +42,98 @@ func (a *apiServer) Activate(_ context.Context, request *google_protobuf.Empty) 
 	}, nil
 }
 
-func (a *apiServer) Create(_ context.Context, request *CreateRequest) (response *CreateResponse, err error) {
+func (a *apiServer) Create(_ context.Context, request *NameOptsRequest) (response *ErrResponse, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
+	return doNameOptsToErr(request, a.create)
+}
+
+func (a *apiServer) create(name string, opts map[string]string) error {
 	volume := &Volume{
-		request.Name,
-		request.Opts,
+		name,
+		opts,
 		"",
 	}
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	if _, ok := a.nameToVolume[request.Name]; ok {
-		return &CreateResponse{
-			Err: fmt.Sprintf("dockervolume: volume already created: %s", request.Name),
-		}, nil
+	if _, ok := a.nameToVolume[name]; ok {
+		return fmt.Errorf("dockervolume: volume already created: %s", name)
 	}
-	if err := a.volumeDriver.Create(request.Name, newOpts(copyStringStringMap(request.Opts))); err != nil {
-		return &CreateResponse{
-			Err: err.Error(),
-		}, nil
+	if err := a.volumeDriver.Create(name, newOpts(opts)); err != nil {
+		return err
 	}
-	a.nameToVolume[request.Name] = volume
-	return &CreateResponse{}, nil
+	a.nameToVolume[name] = volume
+	return nil
 }
 
-func (a *apiServer) Remove(_ context.Context, request *RemoveRequest) (response *RemoveResponse, err error) {
+func (a *apiServer) Remove(_ context.Context, request *NameRequest) (response *ErrResponse, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
+	return doNameToErr(request, a.remove)
+}
+
+func (a *apiServer) remove(name string) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	volume, ok := a.nameToVolume[request.Name]
+	volume, ok := a.nameToVolume[name]
 	if !ok {
-		return &RemoveResponse{
-			Err: fmt.Sprintf("dockervolume: volume does not exist: %s", request.Name),
-		}, nil
+		return fmt.Errorf("dockervolume: volume does not exist: %s", name)
 	}
-	delete(a.nameToVolume, request.Name)
-	if err := a.volumeDriver.Remove(volume.Name, newOpts(copyStringStringMap(volume.Opts)), volume.Mountpoint); err != nil {
-		return &RemoveResponse{
-			Err: err.Error(),
-		}, nil
-	}
-	return &RemoveResponse{}, nil
+	delete(a.nameToVolume, name)
+	return a.volumeDriver.Remove(volume.Name, newOpts(copyStringStringMap(volume.Opts)), volume.Mountpoint)
 }
 
-func (a *apiServer) Path(_ context.Context, request *PathRequest) (response *PathResponse, err error) {
+func (a *apiServer) Path(_ context.Context, request *NameRequest) (response *MountpointErrResponse, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
+	return doNameToMountpointErr(request, a.path)
+}
+
+func (a *apiServer) path(name string) (string, error) {
 	a.lock.RLock()
 	defer a.lock.RUnlock()
-	volume, ok := a.nameToVolume[request.Name]
+	volume, ok := a.nameToVolume[name]
 	if !ok {
-		return &PathResponse{
-			Err: fmt.Sprintf("dockervolume: volume does not exist: %s", request.Name),
-		}, nil
+		return "", fmt.Errorf("dockervolume: volume does not exist: %s", name)
 	}
-	return &PathResponse{
-		Mountpoint: volume.Mountpoint,
-	}, nil
+	return volume.Mountpoint, nil
 }
 
-func (a *apiServer) Mount(_ context.Context, request *MountRequest) (response *MountResponse, err error) {
+func (a *apiServer) Mount(_ context.Context, request *NameRequest) (response *MountpointErrResponse, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
+	return doNameToMountpointErr(request, a.mount)
+}
+
+func (a *apiServer) mount(name string) (string, error) {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	volume, ok := a.nameToVolume[request.Name]
+	volume, ok := a.nameToVolume[name]
 	if !ok {
-		return &MountResponse{
-			Err: fmt.Sprintf("dockervolume: volume does not exist: %s", request.Name),
-		}, nil
+		return "", fmt.Errorf("dockervolume: volume does not exist: %s", name)
 	}
 	if volume.Mountpoint != "" {
-		return &MountResponse{
-			Err: fmt.Sprintf("dockervolume: volume already mounted: %s at %s", volume.Name, volume.Mountpoint),
-		}, nil
+		return "", fmt.Errorf("dockervolume: volume already mounted: %s at %s", volume.Name, volume.Mountpoint)
 	}
 	mountpoint, err := a.volumeDriver.Mount(volume.Name, newOpts(copyStringStringMap(volume.Opts)))
 	volume.Mountpoint = mountpoint
-	if err != nil {
-		return &MountResponse{
-			Mountpoint: mountpoint,
-			Err:        err.Error(),
-		}, nil
-	}
-	return &MountResponse{
-		Mountpoint: mountpoint,
-	}, nil
+	return mountpoint, err
 }
 
-func (a *apiServer) Unmount(_ context.Context, request *UnmountRequest) (response *UnmountResponse, err error) {
+func (a *apiServer) Unmount(_ context.Context, request *NameRequest) (response *ErrResponse, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
+	return doNameToErr(request, a.unmount)
+}
+
+func (a *apiServer) unmount(name string) error {
 	a.lock.Lock()
 	defer a.lock.Unlock()
-	volume, ok := a.nameToVolume[request.Name]
+	volume, ok := a.nameToVolume[name]
 	if !ok {
-		return &UnmountResponse{
-			Err: fmt.Sprintf("dockervolume: volume does not exist: %s", request.Name),
-		}, nil
+		return fmt.Errorf("dockervolume: volume does not exist: %s", name)
 	}
 	if volume.Mountpoint == "" {
-		return &UnmountResponse{
-			Err: fmt.Sprintf("dockervolume: volume not mounted: %s at %s", volume.Name, volume.Mountpoint),
-		}, nil
+		return fmt.Errorf("dockervolume: volume not mounted: %s at %s", volume.Name, volume.Mountpoint)
 	}
 	mountpoint := volume.Mountpoint
 	volume.Mountpoint = ""
-	if err := a.volumeDriver.Unmount(volume.Name, newOpts(copyStringStringMap(volume.Opts)), mountpoint); err != nil {
-		return &UnmountResponse{
-			Err: err.Error(),
-		}, nil
-	}
-	return &UnmountResponse{}, nil
+	return a.volumeDriver.Unmount(volume.Name, newOpts(copyStringStringMap(volume.Opts)), mountpoint)
 }
 
 func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (response *Volumes, err error) {
@@ -190,7 +174,7 @@ func (a *apiServer) Cleanup(_ context.Context, request *google_protobuf.Empty) (
 	}, err
 }
 
-func (a *apiServer) GetVolume(_ context.Context, request *GetVolumeRequest) (response *Volume, err error) {
+func (a *apiServer) GetVolume(_ context.Context, request *NameRequest) (response *Volume, err error) {
 	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
 	a.lock.RLock()
 	defer a.lock.RUnlock()
@@ -214,6 +198,46 @@ func (a *apiServer) ListVolumes(_ context.Context, request *google_protobuf.Empt
 	return &Volumes{
 		Volume: volumes,
 	}, nil
+}
+
+func fromNameOptsRequest(request *NameOptsRequest) (string, map[string]string) {
+	return request.Name, copyStringStringMap(request.Opts)
+}
+
+func fromNameRequest(request *NameRequest) string {
+	return request.Name
+}
+
+func toErrResponse(err error) (*ErrResponse, error) {
+	response := &ErrResponse{}
+	if err != nil {
+		response.Err = err.Error()
+	}
+	return response, nil
+}
+
+func toMountpointErrResponse(mountpoint string, err error) (*MountpointErrResponse, error) {
+	response := &MountpointErrResponse{
+		Mountpoint: mountpoint,
+	}
+	if err != nil {
+		response.Err = err.Error()
+	}
+	return response, nil
+}
+
+func doNameOptsToErr(request *NameOptsRequest, f func(string, map[string]string) error) (*ErrResponse, error) {
+	name, opts := fromNameOptsRequest(request)
+	return toErrResponse(f(name, opts))
+}
+
+func doNameToErr(request *NameRequest, f func(string) error) (*ErrResponse, error) {
+	return toErrResponse(f(fromNameRequest(request)))
+}
+
+func doNameToMountpointErr(request *NameRequest, f func(string) (string, error)) (*MountpointErrResponse, error) {
+	mountpoint, err := f(fromNameRequest(request))
+	return toMountpointErrResponse(mountpoint, err)
 }
 
 func copyStringStringMap(m map[string]string) map[string]string {
