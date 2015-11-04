@@ -109,7 +109,7 @@ func runTest(
 		1,
 		func(addressToServer map[string]*grpc.Server) {
 			for _, server := range addressToServer {
-				RegisterAPIServer(server, newAPIServer(fakeVolumeDriver, "test", false))
+				RegisterAPIServer(server, newAPIServer(fakeVolumeDriver, "test"))
 			}
 		},
 		func(t *testing.T, addressToClientConn map[string]*grpc.ClientConn) {

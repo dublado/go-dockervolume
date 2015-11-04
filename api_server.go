@@ -23,7 +23,7 @@ type apiServer struct {
 	lock             *sync.RWMutex
 }
 
-func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string, noEvents bool) *apiServer {
+func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string) *apiServer {
 	return &apiServer{
 		protorpclog.NewLogger("dockervolume.API"),
 		volumeDriver,
@@ -31,15 +31,6 @@ func newAPIServer(volumeDriver VolumeDriver, volumeDriverName string, noEvents b
 		make(map[string]*Volume),
 		&sync.RWMutex{},
 	}
-}
-
-func (a *apiServer) Activate(_ context.Context, request *google_protobuf.Empty) (response *ActivateResponse, err error) {
-	defer func(start time.Time) { a.Log(request, response, err, time.Since(start)) }(time.Now())
-	return &ActivateResponse{
-		Implements: []string{
-			"VolumeDriver",
-		},
-	}, nil
 }
 
 func (a *apiServer) Create(_ context.Context, request *NameOptsRequest) (response *ErrResponse, err error) {

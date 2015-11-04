@@ -25,16 +25,6 @@ var _ = runtime.String
 var _ = json.Marshal
 var _ = utilities.PascalFromSnake
 
-func request_API_Activate_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
-	var protoReq google_protobuf.Empty
-
-	if err := json.NewDecoder(req.Body).Decode(&protoReq); err != nil {
-		return nil, grpc.Errorf(codes.InvalidArgument, "%v", err)
-	}
-
-	return client.Activate(ctx, &protoReq)
-}
-
 func request_API_Create_0(ctx context.Context, client APIClient, req *http.Request, pathParams map[string]string) (proto.Message, error) {
 	var protoReq NameOptsRequest
 
@@ -151,17 +141,6 @@ func RegisterAPIHandlerFromEndpoint(ctx context.Context, mux *runtime.ServeMux, 
 func RegisterAPIHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.ClientConn) error {
 	client := NewAPIClient(conn)
 
-	mux.Handle("POST", pattern_API_Activate_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
-		resp, err := request_API_Activate_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
-		if err != nil {
-			runtime.HTTPError(ctx, w, err)
-			return
-		}
-
-		forward_API_Activate_0(ctx, w, req, resp, mux.GetForwardResponseOptions()...)
-
-	})
-
 	mux.Handle("POST", pattern_API_Create_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		resp, err := request_API_Create_0(runtime.AnnotateContext(ctx, req), client, req, pathParams)
 		if err != nil {
@@ -254,8 +233,6 @@ func RegisterAPIHandler(ctx context.Context, mux *runtime.ServeMux, conn *grpc.C
 }
 
 var (
-	pattern_API_Activate_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"Plugin.Activate"}, ""))
-
 	pattern_API_Create_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Create"}, ""))
 
 	pattern_API_Remove_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0}, []string{"VolumeDriver.Remove"}, ""))
@@ -274,8 +251,6 @@ var (
 )
 
 var (
-	forward_API_Activate_0 = runtime.ForwardResponseMessage
-
 	forward_API_Create_0 = runtime.ForwardResponseMessage
 
 	forward_API_Remove_0 = runtime.ForwardResponseMessage

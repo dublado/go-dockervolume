@@ -1,6 +1,8 @@
 /*
 Package dockervolume is a library taking care of the generic code for docker volume plugins written in go.
 
+Also see https://go.pedge.io/dockerplugin.
+
 Your volume plugin must implement the VolumeDriver interface.
 
 The API in this package exposes additional functionality on top of the
@@ -9,22 +11,22 @@ docker volume plugin API. See the protocol buffers file for details.
 To launch your plugin using Unix sockets, do:
 
 	func launch(volumeDriver dockervolume.VolumeDriver) error {
-	  return dockervolume.NewUnixServer(
+	  return dockerplugin.NewUnixServer(
 		volumeDriver,
 		"volume_driver_name",
 		"root",
-		dockervolume.ServerOptions{},
+		dockerplugin.ServerOptions{},
 	  ).Serve()
 	}
 
 To launch your plugin using TCP, do:
 
 	func launch(volumeDriver dockervolume.VolumeDriver) error {
-	  return dockervolume.NewTCPServer(
+	  return dockerplugin.NewTCPServer(
 		volumeDriver,
 		"volume_driver_name",
 		"address",
-		dockervolume.ServerOptions{},
+		dockerplugin.ServerOptions{},
 	  ).Serve()
 	}
 
@@ -35,11 +37,10 @@ https://github.com/pachyderm/pachyderm/tree/master/src/cmd/pfs-volume-driver
 */
 package dockervolume // import "go.pedge.io/dockervolume"
 
-import "go.pedge.io/pkg/map"
-
-const (
-	// DefaultGRPCPort is the default port used for grpc.
-	DefaultGRPCPort uint16 = 2150
+import (
+	"go.pedge.io/dockerplugin"
+	"go.pedge.io/pkg/map"
+	"google.golang.org/grpc"
 )
 
 // VolumeDriver is the interface that should be implemented for custom volume drivers.
@@ -82,17 +83,9 @@ func NewVolumeDriverClient(apiClient APIClient) VolumeDriverClient {
 	return newVolumeDriverClient(apiClient)
 }
 
-// Server serves a VolumeDriver.
-type Server interface {
-	Serve() error
-}
-
-// ServerOptions are options for a Server.
-type ServerOptions struct {
-	NoEvents          bool
-	GRPCPort          uint16
-	GRPCDebugPort     uint16
-	CleanupOnShutdown bool
+// NewAPIServer returns a new APIServer for the given VolumeDriver and name.
+func NewAPIServer(volumeDriver VolumeDriver, volumeDriverName string) APIServer {
+	return newAPIServer(volumeDriver, volumeDriverName)
 }
 
 // NewTCPServer returns a new Server for TCP.
@@ -100,12 +93,13 @@ func NewTCPServer(
 	volumeDriver VolumeDriver,
 	volumeDriverName string,
 	address string,
-	opts ServerOptions,
-) Server {
-	return newServer(
-		protocolTCP,
-		volumeDriver,
+	opts dockerplugin.ServerOptions,
+) dockerplugin.Server {
+	return dockerplugin.NewTCPServer(
 		volumeDriverName,
+		[]string{"VolumeDriver"},
+		func(s *grpc.Server) { RegisterAPIServer(s, NewAPIServer(volumeDriver, volumeDriverName)) },
+		RegisterAPIHandler,
 		address,
 		opts,
 	)
@@ -116,12 +110,13 @@ func NewUnixServer(
 	volumeDriver VolumeDriver,
 	volumeDriverName string,
 	group string,
-	opts ServerOptions,
-) Server {
-	return newServer(
-		protocolUnix,
-		volumeDriver,
+	opts dockerplugin.ServerOptions,
+) dockerplugin.Server {
+	return dockerplugin.NewUnixServer(
 		volumeDriverName,
+		[]string{"VolumeDriver"},
+		func(s *grpc.Server) { RegisterAPIServer(s, NewAPIServer(volumeDriver, volumeDriverName)) },
+		RegisterAPIHandler,
 		group,
 		opts,
 	)

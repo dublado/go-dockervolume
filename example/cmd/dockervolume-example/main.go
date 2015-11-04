@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 
+	"go.pedge.io/dockerplugin"
 	"go.pedge.io/dockervolume"
 )
 
@@ -23,6 +24,6 @@ func do() error {
 		newVolumeDriver("/tmp/dockervolume-example-mount"),
 		"dockervolume-example",
 		":6789",
-		dockervolume.ServerOptions{},
+		dockerplugin.ServerOptions{},
 	).Serve()
 }

@@ -81,15 +81,6 @@ func (m *NameRequest) Reset()         { *m = NameRequest{} }
 func (m *NameRequest) String() string { return proto.CompactTextString(m) }
 func (*NameRequest) ProtoMessage()    {}
 
-// ActivateResponse is a response for the docker volume plugin API activate function call.
-type ActivateResponse struct {
-	Implements []string `protobuf:"bytes,1,rep,name=implements" json:"implements,omitempty"`
-}
-
-func (m *ActivateResponse) Reset()         { *m = ActivateResponse{} }
-func (m *ActivateResponse) String() string { return proto.CompactTextString(m) }
-func (*ActivateResponse) ProtoMessage()    {}
-
 // ErrResponse is a response for the docker volume plugin API with a potential error.
 type ErrResponse struct {
 	Err string `protobuf:"bytes,1,opt,name=err" json:"err,omitempty"`
@@ -116,8 +107,6 @@ var _ grpc.ClientConn
 // Client API for API service
 
 type APIClient interface {
-	// Activate is the activate function call for the docker volume plugin API.
-	Activate(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*ActivateResponse, error)
 	// Create is the create function call for the docker volume plugin API.
 	Create(ctx context.Context, in *NameOptsRequest, opts ...grpc.CallOption) (*ErrResponse, error)
 	// Remove is the remove function call for the docker volume plugin API.
@@ -145,15 +134,6 @@ type aPIClient struct {
 
 func NewAPIClient(cc *grpc.ClientConn) APIClient {
 	return &aPIClient{cc}
-}
-
-func (c *aPIClient) Activate(ctx context.Context, in *google_protobuf1.Empty, opts ...grpc.CallOption) (*ActivateResponse, error) {
-	out := new(ActivateResponse)
-	err := grpc.Invoke(ctx, "/dockervolume.API/Activate", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *aPIClient) Create(ctx context.Context, in *NameOptsRequest, opts ...grpc.CallOption) (*ErrResponse, error) {
@@ -231,8 +211,6 @@ func (c *aPIClient) ListVolumes(ctx context.Context, in *google_protobuf1.Empty,
 // Server API for API service
 
 type APIServer interface {
-	// Activate is the activate function call for the docker volume plugin API.
-	Activate(context.Context, *google_protobuf1.Empty) (*ActivateResponse, error)
 	// Create is the create function call for the docker volume plugin API.
 	Create(context.Context, *NameOptsRequest) (*ErrResponse, error)
 	// Remove is the remove function call for the docker volume plugin API.
@@ -256,18 +234,6 @@ type APIServer interface {
 
 func RegisterAPIServer(s *grpc.Server, srv APIServer) {
 	s.RegisterService(&_API_serviceDesc, srv)
-}
-
-func _API_Activate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
-	in := new(google_protobuf1.Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	out, err := srv.(APIServer).Activate(ctx, in)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func _API_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error) (interface{}, error) {
@@ -370,10 +336,6 @@ var _API_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "dockervolume.API",
 	HandlerType: (*APIServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Activate",
-			Handler:    _API_Activate_Handler,
-		},
 		{
 			MethodName: "Create",
 			Handler:    _API_Create_Handler,

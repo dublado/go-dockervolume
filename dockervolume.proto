@@ -28,11 +28,6 @@ message NameRequest {
   string name = 1;
 }
 
-// ActivateResponse is a response for the docker volume plugin API activate function call.
-message ActivateResponse {
-  repeated string implements = 1;
-}
-
 // ErrResponse is a response for the docker volume plugin API with a potential error.
 message ErrResponse {
   string err = 1;
@@ -46,13 +41,6 @@ message MountpointErrResponse {
 
 // API is the API for the dockervolume package.
 service API {
-  // Activate is the activate function call for the docker volume plugin API.
-  rpc Activate(google.protobuf.Empty) returns (ActivateResponse) {
-    option (google.api.http) = {
-      post: "/Plugin.Activate"
-      body: "*"
-    };
-  }
   // Create is the create function call for the docker volume plugin API.
   rpc Create(NameOptsRequest) returns (ErrResponse) {
     option (google.api.http) = {

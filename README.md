@@ -33,6 +33,8 @@ import (
 All public functionality is exposed in the [dockervolume.go](dockervolume.go) file and
 the generated [dockervolume.pb.go](dockervolume.pb.go) file.
 
+Also see https://go.pedge.io/dockerplugin.
+
 Your volume plugin must implement the `VolumeDriver` interface.
 
 The API in this package exposes additional functionality on top of the

@@ -1,19 +1,3 @@
-.PHONY: \
-	all \
-	deps \
-	updatedeps \
-	testdeps \
-	updatetestdeps \
-	build \
-	install \
-	lint \
-	vet \
-	errcheck \
-	pretest \
-	test \
-	clean \
-	proto
-
 all: test
 
 deps:
@@ -61,3 +45,19 @@ clean:
 proto:
 	go get -v go.pedge.io/tools/protoc-all
 	STRIP_PACKAGE_COMMENTS=1 protoc-all go.pedge.io/dockervolume
+
+.PHONY: \
+	all \
+	deps \
+	updatedeps \
+	testdeps \
+	updatetestdeps \
+	build \
+	install \
+	lint \
+	vet \
+	errcheck \
+	pretest \
+	test \
+	clean \
+	proto
