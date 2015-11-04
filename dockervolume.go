@@ -11,7 +11,7 @@ docker volume plugin API. See the protocol buffers file for details.
 To launch your plugin using Unix sockets, do:
 
 	func launch(volumeDriver dockervolume.VolumeDriver) error {
-	  return dockerplugin.NewUnixServer(
+	  return dockervolume.NewUnixServer(
 		volumeDriver,
 		"volume_driver_name",
 		"root",
@@ -22,7 +22,7 @@ To launch your plugin using Unix sockets, do:
 To launch your plugin using TCP, do:
 
 	func launch(volumeDriver dockervolume.VolumeDriver) error {
-	  return dockerplugin.NewTCPServer(
+	  return dockervolume.NewTCPServer(
 		volumeDriver,
 		"volume_driver_name",
 		"address",
